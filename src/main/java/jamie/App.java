@@ -37,8 +37,8 @@ public class App {
 
         // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
         Map<String, String> parameters = Map.of(
-            "interval", "interval=1d",
-            "range", "range=3d"
+            "interval", "interval=1h",
+            "range", "range=1mo"
         );
 
 

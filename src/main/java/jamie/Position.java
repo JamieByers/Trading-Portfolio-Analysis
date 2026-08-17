@@ -2,11 +2,14 @@ package jamie;
 
 import org.json.JSONObject;
 
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 
 public class Position {
     public float quantityAvailableForTrading;
     public String createdAt;
+    public String holdingTime;
     public float quantityInPies;
     public float averagePricePaid;
     public float quantity;
@@ -25,10 +28,15 @@ public class Position {
     public void parse(JSONObject o) {
         this.quantityAvailableForTrading = o.getFloat("quantityAvailableForTrading");
         this.quantity = o.getFloat("quantity");
-        this.createdAt = o.getString("createdAt");
         this.quantityInPies = o.getFloat("quantityInPies");
         this.averagePricePaid = o.getFloat("averagePricePaid");
         this.currentPrice = o.getFloat("currentPrice");
+        this.createdAt = o.getString("createdAt");
+
+        Instant now = Instant.now();
+        Instant createdAtInstant = Instant.parse(this.createdAt);
+        long holdingTime = Duration.between(createdAtInstant, now).toDays();
+        this.holdingTime = Long.toString(holdingTime);
 
         //instrument
         JSONObject instrument = o.getJSONObject("instrument");

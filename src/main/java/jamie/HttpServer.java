@@ -5,7 +5,13 @@ import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.json.JSONArray;
+import org.json.JSONObject;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class HttpServer {
     public List<CombinedPosition> combined_positions;
@@ -60,6 +66,14 @@ public class HttpServer {
             case "/coffee":
                 writeResponse("Coffee!!!!", writer);
                 break;
+
+            case "/all":
+                ObjectMapper mapper = new ObjectMapper();
+                String json = mapper.writeValueAsString(this.combined_positions);
+
+                writeResponse(json.toString(), writer);
+                break;
+
             default:
                 CombinedPosition pos = linearSearch(path.substring(1));
                 if (pos == null) {
