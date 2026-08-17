@@ -43,32 +43,7 @@ async function getTicker(ticker: string) {
     return parse(data)
 }
 
-type CandleStickGraph = {
-    timestamps: string[],
-    data: number[][]
-}
 
-async function getDetailedTicker(ticker: string) {
-    let json = await getData("/" + ticker)
-    let ypos = json.yahooPosition
-    let tels = ypos.timestamp_elements
-
-    let timestamps = []
-    let timestamp_data = []
-
-    for (let tel of tels) {
-        timestamps.push(tel.timestamp)
-        let current_timestamp = [tel.open, tel.close, tel.low, tel.high]
-        timestamp_data.push(current_timestamp)
-    }
-
-    let csg: CandleStickGraph = {
-        timestamps: timestamps,
-        data: timestamp_data
-    }
-
-    return csg
-}
 
 async function getTickers(tickers: string[]) {
     let lines: Line[] = []
@@ -100,37 +75,156 @@ async function parse(data) {
     return line
 }
 
+async function createLineGraph() {
+    // let lines = await getTickers(tickers)
+    let lines = await getAllData()
+    let timestamps = []
+    if (lines.length > 0) {
+        timestamps = lines[0].timestamps
+    }
+
+    let series = []
+
+    for (let line of lines)  {
+        series.push({
+            data: line.changes,
+            type: 'line'
+        })
+    }
+
+    let option = {
+      xAxis: {
+        type: 'category',
+        data: timestamps
+      },
+      yAxis: {
+        type: 'value'
+      },
+      series: series,
+
+    };
+
+    return option
+}
+
+type CandleStickGraph = {
+    timestamps: string[]
+    data: number[][]
+    full_data: any
+    changes: number[]
+    min: number
+    max: number
+}
+
+async function getDetailedTicker(ticker: string) {
+    let json = await getData("/" + ticker)
+    let ypos = json.yahooPosition
+    let tels = ypos.timestamp_elements
+    console.log(tels)
+
+    let timestamps = []
+    let timestamp_data = []
+    let changes = []
+
+    let min = Math.min(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
+    let max = Math.max(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
+
+    for (let tel of tels) {
+        timestamps.push(tel.timestamp.slice(0,10))
+        let current_timestamp: number[] = [tel.open, tel.close, tel.low, tel.high]
+        let possible_new_min = Math.min(...current_timestamp)
+        let possible_new_max = Math.min(...current_timestamp)
+
+        if (possible_new_min < min) { min = possible_new_min }
+        if (possible_new_max > max) { max = possible_new_max }
+
+        changes.push(tel.priceChange)
+        timestamp_data.push(current_timestamp)
+    }
+
+    min = Math.floor(min)
+    min -= min*0.15
+
+    max = Math.ceil(max)
+    max += max*0.15
+
+    let csg: CandleStickGraph = {
+        timestamps: timestamps,
+        data: timestamp_data,
+        full_data: json,
+        changes: changes,
+        min: min,
+        max: max
+    }
+
+    return csg
+}
+
+async function createCandleStickGraph() {
+    let csg = await getDetailedTicker("SNDK")
+    let ypos = csg.full_data.yahooPosition
+    console.log(csg.changes)
+
+    let option = {
+      title: { text: ypos.ticker + " " + ypos.name },
+      legend: { type: "plain" },
+      xAxis: {
+        type: 'category',
+        data: csg.timestamps
+      },
+      yAxis: [
+        {
+            type: 'value',
+            min: csg.min,
+            max: csg.max,
+            axisLabel: {
+                formatter: (value: number) => `£${value}`
+            }
+        },
+
+        {
+            type: "value",
+            min: 0,
+            max: 900,
+            axisLabel: {
+                formatter: (value: number) => `${value}`
+            }
+        }
+      ],
+      series: [
+        {
+            name: "Range",
+            type: "candlestick",
+            data: csg.data,
+            yAxisIndex: 0,
+            z: 1,
+        },
+
+        {
+            name: "Change",
+            type: "bar",
+            data: csg.changes,
+            yAxisIndex: 1,
+            z: 2,
+
+            itemStyle: {
+                opacity: 0.2
+            },
+            barWidth: "30%"
+        }
+      ],
+      tooltip: {
+            position: [10, 10]
+        }
+    };
+
+    return option
+}
+
 
 let mychart = echarts.init(document.getElementById("chart"));
 
-
-// let lines = await getTickers(tickers)
-let lines = await getAllData()
-let timestamps = []
-if (lines.length > 0) {
-    timestamps = lines[0].timestamps
-}
-
-let series = []
-
-for (let line of lines)  {
-    series.push({
-        data: line.changes,
-        type: 'line'
-    })
-}
-
-let option = {
-  xAxis: {
-    type: 'category',
-    data: timestamps
-  },
-  yAxis: {
-    type: 'value'
-  },
-  series: series,
-
-};
+let option = await createCandleStickGraph();
 
 mychart.setOption(option);
 

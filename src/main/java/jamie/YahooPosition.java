@@ -78,10 +78,10 @@ public class YahooPosition {
         for (int i = 0; i < close.length(); i++) {
             TimestampElement current_timestamp = new TimestampElement(
                 timestamp.get(i).toString(),
-                high.isNull(i) ? -1.0 : high.getDouble(i),
-                low.isNull(i) ? -1.0 : low.getDouble(i),
+                open.isNull(i) ? -1.0 : open.getDouble(i),
                 close.isNull(i) ? -1.0 : close.getDouble(i),
-                volume.isNull(i) ? -1.0 : volume.getDouble(i)
+                low.isNull(i) ? -1.0 : low.getDouble(i),
+                high.isNull(i) ? -1.0 : high.getDouble(i)
             );
 
             if (!close.isNull(i) && !open.isNull(i)) {

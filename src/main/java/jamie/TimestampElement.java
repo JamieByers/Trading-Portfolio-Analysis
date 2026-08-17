@@ -12,11 +12,11 @@ public class TimestampElement {
     public double priceFlux;
     public String percentageMessage;
 
-    public TimestampElement(String timestamp, double high, double low, double close, double open) {
+    public TimestampElement(String timestamp, double open, double close, double low, double high) {
         this.timestamp = timestamp;
-        this.high = high;
-        this.low = low;
-        this.close = close;
         this.open = open;
+        this.close = close;
+        this.low = low;
+        this.high = high;
     }
 }
