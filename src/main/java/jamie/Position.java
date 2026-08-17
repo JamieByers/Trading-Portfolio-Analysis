@@ -5,28 +5,22 @@ import org.json.JSONObject;
 import java.util.HashMap;
 
 public class Position {
-    float quantityAvailableForTrading;
-    String createdAt;
-    float quantityInPies;
-    float averagePricePaid;
-    float quantity;
-    float currentPrice;
-    String ticker;
-    String possibleYahooTicker;
-    String name;
-    String stockCurrency;
-    String isin;
-    float fxImpact;
-    String walletCurrency;
-    float totalCost;
-    float currentValue;
-    float upl; // unrealised profit/loss
-    HashMap<String, String> marketLookup;
-
-    Position() {
-        this.marketLookup = marketLookupTable();
-    }
-
+    public float quantityAvailableForTrading;
+    public String createdAt;
+    public float quantityInPies;
+    public float averagePricePaid;
+    public float quantity;
+    public float currentPrice;
+    public String ticker;
+    public String possibleYahooTicker;
+    public String name;
+    public String stockCurrency;
+    public String isin;
+    public float fxImpact;
+    public String walletCurrency;
+    public float totalCost;
+    public float currentValue;
+    public float upl; // unrealised profit/loss
 
     public void parse(JSONObject o) {
         this.quantityAvailableForTrading = o.getFloat("quantityAvailableForTrading");
@@ -86,7 +80,8 @@ public class Position {
         String market = "";
         String suffix = real_ticker.replaceAll("^[A-Z0-9]+", "");
         if (suffix != "") {
-            market = this.marketLookup.getOrDefault(suffix, "."+suffix.toUpperCase());
+            HashMap<String, String> lookup = marketLookupTable();
+            market = lookup.getOrDefault(suffix, "."+suffix.toUpperCase());
         }
 
         real_ticker = real_ticker.replaceAll("[a-z]", "");

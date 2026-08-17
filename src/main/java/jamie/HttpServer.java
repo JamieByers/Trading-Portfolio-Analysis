@@ -1,0 +1,106 @@
+package jamie;
+
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.net.*;
+import java.util.List;
+
+public class HttpServer {
+    public List<CombinedPosition> combined_positions;
+
+    public HttpServer(List<CombinedPosition> combined_positions) {
+        this.combined_positions = combined_positions;
+    }
+
+    public void initialise() {
+        try{
+            ServerSocket server = new ServerSocket(8080);
+
+            boolean running = true;
+            while (running) {
+                Socket socket = server.accept();
+
+                BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(socket.getInputStream())
+                );
+
+                String line = reader.readLine();
+                System.out.println(line);
+                // ignore the rest of the request
+
+
+                BufferedWriter writer = new BufferedWriter(
+                    new OutputStreamWriter(socket.getOutputStream()
+                ));
+
+                Request request = parse(line);
+
+                if (request.requestType.equals("GET")) {
+                    route(request.path, writer);
+                } else {
+                    writeResponse("Only GET requests are accepted", writer);
+                }
+
+                writer.flush();
+
+                writer.close();
+                socket.close();
+            }
+
+            server.close();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void route(String path, BufferedWriter writer) throws Exception {
+        switch (path) {
+            case "/coffee":
+                writeResponse("Coffee!!!!", writer);
+                break;
+            default:
+                CombinedPosition pos = linearSearch(path.substring(1));
+                if (pos == null) {
+                    writeResponse("Failed to find a position with ticker: " + path, writer);
+                    break;
+                } else {
+                    writeResponse(pos.toJson(), writer);
+                    break;
+                }
+        }
+    }
+
+    public CombinedPosition linearSearch(String ticker) {
+        for ( CombinedPosition pos : this.combined_positions ) {
+            if (pos.position.ticker.contains(ticker)) {
+                return pos;
+            }
+        }
+        return null;
+    }
+
+
+    public record Request (String requestType, String path) {}
+
+    public Request parse(String request) {
+        String[] keywords = request.split(" ");
+        String requestType = keywords[0];
+        String path = keywords[1];
+
+        return new Request(requestType, path);
+    }
+
+    public void writeResponse(String message, BufferedWriter writer) throws Exception {
+        writer.write("HTTP/1.1 200 OK\r\n");
+        writer.write("Content-Type: text/plain\r\n");
+        writer.write("Access-Control-Allow-Origin: *\r\n");
+        writer.write("Content-Length: " + message.length() + "\r\n");
+        writer.write("\r\n");
+        writer.write(message);
+    }
+
+}
+
+

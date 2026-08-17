@@ -3,7 +3,6 @@ package jamie;
 import java.net.*;
 import java.net.http.*;
 import java.util.Base64;
-import java.util.HashMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -19,17 +18,19 @@ public class App {
         JSONArray json = getPortfolio(client);
         List<Position> positions = getPositionObjects(json);
         List<YahooPosition> yahoo_data = new ArrayList<YahooPosition>();
-        HashMap<Position, YahooPosition> position_data = new HashMap<Position, YahooPosition>();
+        List<CombinedPosition> combined_positions = new ArrayList<CombinedPosition>();
 
         for (Position pos : positions) {
             YahooPosition ypos = getYahooInformation(pos, client);
-            position_data.put(pos, ypos);
             yahoo_data.add(ypos);
+            CombinedPosition combinedPosition = new CombinedPosition(pos, ypos);
+            combined_positions.add(combinedPosition);
         }
 
-        yahoo_data.get(2).printJson();
-        yahoo_data.get(2).print();
+        // combined_positions.get(1).print();
 
+        HttpServer server = new HttpServer(combined_positions);
+        server.initialise();
     }
 
     public static YahooPosition getYahooInformation(Position position, HttpClient client) {
@@ -37,7 +38,7 @@ public class App {
         // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
         Map<String, String> parameters = Map.of(
             "interval", "interval=1d",
-            "range", "range=1wk"
+            "range", "range=3d"
         );
 
 
@@ -75,10 +76,9 @@ public class App {
 
         for ( Object line : json) {
             JSONObject o = (JSONObject) line;
-            // System.out.println(o);
             Position position = new Position();
             position.parse(o);
-            position.print();
+            // position.print();
 
             positions.add(position);
         }
@@ -109,7 +109,7 @@ public class App {
 
             JSONArray json = new JSONArray(response.body());
 
-            System.out.println(json);
+            // System.out.println(json);
             return json;
 
 

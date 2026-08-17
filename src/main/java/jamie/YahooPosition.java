@@ -10,26 +10,27 @@ public class YahooPosition {
     public JSONObject json;
 
     // meta
-    String name;
-    String ticker;
-    String timezone;
-    String range;
-    String currency;
-    float fiftyTwoWeekHigh;
+    public String name;
+    public String ticker;
+    public String timezone;
+    public String range;
+    public String currency;
+    public float fiftyTwoWeekHigh;
 
     // indicators
-    JSONArray volume;
-    JSONArray high;
-    JSONArray low;
-    JSONArray close;
-    JSONArray open;
+    public JSONArray volume;
+    public JSONArray high;
+    public JSONArray low;
+    public JSONArray close;
+    public JSONArray open;
 
-    List<String> timestamp;
-    String firstTradeDate;
+    public List<String> timestamp;
+    public List<TimestampElement> timestamp_elements;
+    public String firstTradeDate;
 
-    Map<String, String> currencySigns;
+    public Map<String, String> currencySigns;
 
-    YahooPosition(JSONObject json) {
+    public YahooPosition(JSONObject json) {
         this.json = json;
 
         JSONObject chart = json.getJSONObject("chart");
@@ -45,7 +46,9 @@ public class YahooPosition {
             String new_timestamp = Instant.ofEpochSecond(timestamp_value).atZone(ZoneId.of("Europe/London")).toString();
             real_timestamps.add(new_timestamp);
         }
+
         this.timestamp = real_timestamps;
+        this.timestamp_elements = new ArrayList<TimestampElement>();
 
 
         // meta
@@ -67,6 +70,54 @@ public class YahooPosition {
         this.close = quote.getJSONArray("close");
         this.open = quote.getJSONArray("open");
 
+
+        String priceChange;
+        String priceFlux;
+        String priceChangePercentage;
+
+        for (int i = 0; i < close.length(); i++) {
+            TimestampElement current_timestamp = new TimestampElement(
+                timestamp.get(i).toString(),
+                high.isNull(i) ? -1.0 : high.getDouble(i),
+                low.isNull(i) ? -1.0 : low.getDouble(i),
+                close.isNull(i) ? -1.0 : close.getDouble(i),
+                volume.isNull(i) ? -1.0 : volume.getDouble(i)
+            );
+
+            if (!close.isNull(i) && !open.isNull(i)) {
+                double change = (close.getDouble(i) - open.getDouble(i));
+                priceChange = Double.toString(change);
+
+                boolean negative = false;
+                if (change < 0) {
+                    change *= -1;
+                    negative = true ;
+                }
+
+                double pcp = ((double) change / (double) open.getDouble(i)) * 100;
+                if (negative) { pcp *= -1; }
+
+                current_timestamp.priceChange = change;
+                current_timestamp.priceChangePercentage = pcp;
+                priceChangePercentage = String.format(" (%.2f%%)", pcp);
+                current_timestamp.percentageMessage = priceChangePercentage;
+
+            } else {
+                priceChange = "Error";
+                priceChangePercentage = "";
+            }
+
+
+            if (!high.isNull(i) && !low.isNull(i)) {
+                double flux = (high.getDouble(i) - low.getDouble(i));
+                priceFlux = Double.toString(flux);
+                current_timestamp.priceFlux = flux;
+            } else {
+                priceFlux = "Error";
+            }
+
+            this.timestamp_elements.add(current_timestamp);
+        }
     }
 
     public void changeToday() {
@@ -108,22 +159,8 @@ public class YahooPosition {
         System.out.println("Market Data:");
 
         for (int i = 0; i < close.length(); i++) {
-            String priceChange;
-            String priceFlux;
 
-            if (!close.isNull(i) && !open.isNull(i)) {
-                long change = (close.getLong(i) - open.getLong(i));
-                priceChange = Long.toString(change);
-            } else {
-                priceChange = "Error";
-            }
-
-            if (!high.isNull(i) && !low.isNull(i)) {
-                long flux = (high.getLong(i) - low.getLong(i));
-                priceFlux = Long.toString(flux);
-            } else {
-                priceFlux = "Error";
-            }
+            TimestampElement current_timestamp = this.timestamp_elements.get(i);
 
             System.out.println(
                 "Timestamp: " + timestamp.get(i) +
@@ -132,8 +169,8 @@ public class YahooPosition {
                 " | Low: " + low.get(i) +
                 " | Close: " + close.get(i) +
                 " | Volume: " + volume.get(i) +
-                " | Price Change: " + priceChange +
-                " | Price Fluxuation: " + priceFlux
+                " | Price Change: " + current_timestamp.priceChange + current_timestamp.percentageMessage +
+                " | Price Fluctuation: " + current_timestamp.priceFlux
             );
         }
     }
