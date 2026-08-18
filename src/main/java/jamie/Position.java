@@ -8,8 +8,6 @@ import java.util.HashMap;
 
 public class Position {
     public float quantityAvailableForTrading;
-    public String createdAt;
-    public String holdingTime;
     public float quantityInPies;
     public float averagePricePaid;
     public float quantity;
@@ -25,6 +23,10 @@ public class Position {
     public float currentValue;
     public float upl; // unrealised profit/loss
 
+    public String createdAt;
+    public String holdingTime;
+    public long holdingTimeValue;
+
     public void parse(JSONObject o) {
         this.quantityAvailableForTrading = o.getFloat("quantityAvailableForTrading");
         this.quantity = o.getFloat("quantity");
@@ -35,8 +37,9 @@ public class Position {
 
         Instant now = Instant.now();
         Instant createdAtInstant = Instant.parse(this.createdAt);
-        long holdingTime = Duration.between(createdAtInstant, now).toDays();
-        this.holdingTime = Long.toString(holdingTime);
+        Duration holdingTime = Duration.between(createdAtInstant, now);
+        this.holdingTimeValue = holdingTime.toSeconds();
+        this.holdingTime = Long.toString(holdingTime.toDays());
 
         //instrument
         JSONObject instrument = o.getJSONObject("instrument");

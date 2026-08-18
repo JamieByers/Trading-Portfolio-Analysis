@@ -34,6 +34,35 @@ async function getAllData() {
     return lines
 }
 
+async function createPieChart() {
+    let all_data = await getData("/all")
+
+    let data = []
+    let personal_positons = []
+    for ( let pos of all_data ) {
+        let p = pos.position;
+        personal_positons.push(p)
+        if (p.upl > 0) {
+            data.push({value: p.upl, name: p.name})
+        }
+    }
+
+    console.log(data)
+    let option = {
+        title: {
+            text: "Profit Share on Personal Positions"
+        },
+        series: [
+            {
+                type: "pie",
+                data: data
+            }
+        ]
+    }
+
+    return option
+}
+
 
 async function getTicker(ticker: string) {
     let json = await getData("/" + ticker)
@@ -43,6 +72,103 @@ async function getTicker(ticker: string) {
     return parse(data)
 }
 
+
+async function topChart() {
+    let all_data = await getData("/all")
+
+    let personal_positons = []
+    for ( let pos of all_data ) {
+        let p = pos.position;
+        personal_positons.push(p)
+    }
+
+    personal_positons.sort((a,b) => b.upl - a.upl)
+
+    let axis_labels = []
+    let data = []
+
+    for ( let i = 0; i < 5; i++) {
+        axis_labels.push(personal_positons[i].name)
+        data.push(personal_positons[i].upl)
+    }
+
+    let option = {
+        title: {
+            text: "Top Winners"
+        },
+        xAxis: {
+            type: "value"
+        },
+        yAxis: {
+            type: "category",
+            data: axis_labels.reverse()
+        },
+        series: [{
+            type: "bar",
+            data: data.reverse()
+        }]
+    }
+
+    return option
+}
+
+
+async function portfolioOverTime() {
+    let all_data = await getData("/all")
+
+    let personal_positons = []
+
+    for ( let pos of all_data ) {
+        let p = pos.position;
+        personal_positons.push(p)
+
+    }
+
+    personal_positons.sort((a,b) => b.holdingTimeValue - a.holdingTimeValue)
+
+    let cost = []
+    let total_cost = 0
+    let ca = []
+
+    for ( let pp of personal_positons ) {
+        total_cost += pp.totalCost
+        cost.push(total_cost)
+
+        let date = pp.createdAt.slice(0,10).split("-")
+        ca.push(date[2] + "/" + date[1] + "/" + date[0])
+    }
+
+    let option = {
+        title: {
+            text: "Estimate Investments Over Time"
+        },
+
+        yAxis: {
+            type: "value",
+            axisLabel: {
+                show: false
+            },
+            axisLine: {
+                show: true
+            }
+        },
+        xAxis: {
+            type: "category",
+            data: ca
+        },
+
+        series: [{
+            type: "line",
+            data: cost,
+        }],
+        tooltip: {
+            position: [10, 10]
+        }
+    }
+
+    return option
+
+}
 
 
 async function getTickers(tickers: string[]) {
@@ -107,6 +233,7 @@ async function createLineGraph() {
     return option
 }
 
+
 type CandleStickGraph = {
     timestamps: string[]
     data: number[][]
@@ -160,8 +287,8 @@ async function getDetailedTicker(ticker: string) {
     return csg
 }
 
-async function createCandleStickGraph() {
-    let csg = await getDetailedTicker("SNDK")
+async function createCandleStickGraph(ticker: string) {
+    let csg = await getDetailedTicker(ticker)
     let ypos = csg.full_data.yahooPosition
     console.log(csg.changes)
 
@@ -222,9 +349,32 @@ async function createCandleStickGraph() {
 }
 
 
-let mychart = echarts.init(document.getElementById("chart"));
+let current_path = window.location.pathname.split("/")
+console.log(current_path)
 
-let option = await createCandleStickGraph();
+let path: string;
+if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
 
-mychart.setOption(option);
+let linegraph = echarts.init(document.getElementById("chart"));
+let option = await createCandleStickGraph(path);
+
+linegraph.setOption(option);
+
+
+let pieChart = echarts.init(document.getElementById("pieChart"))
+let pie_option = await createPieChart()
+
+pieChart.setOption(pie_option)
+
+
+let topLosersChartElement = echarts.init(document.getElementById("topChart"))
+let tlc_option = await topChart()
+
+topLosersChartElement.setOption(tlc_option)
+
+
+let portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
+let pot = await portfolioOverTime()
+
+portfolioOvertime.setOption(pot)
 

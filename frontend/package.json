@@ -13,6 +13,8 @@
     "vite": "^8.2.0"
   },
   "dependencies": {
-    "echarts": "^6.1.0"
+    "@tailwindcss/vite": "^4.3.3",
+    "echarts": "^6.1.0",
+    "tailwindcss": "^4.3.3"
   }
 }
