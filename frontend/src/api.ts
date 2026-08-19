@@ -1,7 +1,13 @@
 import * as types from "./types"
 
+type Cache = Map<string, string>
+let cache: Cache = new Map<string, string>()
+
 export async function getData(path: string) {
     let url = "http://localhost:8080"
+
+    if (cache.get(path) != null) { return cache.get(path) }
+
     const response = await fetch(url+path);
     if (!response.ok) {
         throw new Error
@@ -9,7 +15,18 @@ export async function getData(path: string) {
 
     let json = await response.json();
 
+    cache.set(path, json)
+
     return json
+}
+
+export async function parseParams(path: string) {
+    let split_path = path.split("?")
+    let real_path = split_path[0]
+    let params = split_path[1].split("&")
+
+    return [real_path, params]
+
 }
 
 
@@ -71,11 +88,13 @@ export async function getTickers(tickers: string[]) {
 }
 
 
-export async function getDetailedTicker(ticker: string) {
-    let json = await getData("/" + ticker)
+export async function getDetailedTicker(ticker: string, params?: string) {
+    params ??= window.location.search || "?interval=1h&range=1wk"
+
+    let json = await getData("/" + ticker + params)
+    console.log(json)
     let ypos = json.yahooPosition
     let tels = ypos.timestamp_elements
-    console.log(tels)
 
     let timestamps = []
     let timestamp_data = []

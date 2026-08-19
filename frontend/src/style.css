@@ -10,9 +10,15 @@ body {
 }
 
 #chartSection {
+    position: relative;
     height: 65vh;
+    width: 100%;
     border-radius: 20px;
     padding: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 0;
 }
 
 #chart {
@@ -20,6 +26,23 @@ body {
     height: 600px;
     background-color: white;
     border-radius: 20px;
+    z-index: 1;
+}
+
+.loading {
+    position: absolute;
+    inset: 0;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 10;
+    pointer-events: none;}
+
+.loading > h1 {
+    font-size: 4vw;
+    opacity: 0.5;
 }
 
 #extraInfo {

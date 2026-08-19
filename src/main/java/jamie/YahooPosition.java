@@ -1,5 +1,6 @@
 package jamie;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import java.time.*;
@@ -171,5 +172,9 @@ public class YahooPosition {
 
     public void printJson() {
         System.out.println(this.json.toString(4));
+    }
+
+    public String toJson() throws Exception {
+        return new ObjectMapper().writeValueAsString(this);
     }
 }

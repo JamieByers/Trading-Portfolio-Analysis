@@ -16,7 +16,7 @@ public class App {
         JSONArray json = getPortfolio(client);
         List<Position> positions = getPositionObjects(json);
 
-        HttpServer server = new HttpServer(positions);
+        HttpServer server = new HttpServer(positions, client);
         server.initialise();
     }
 

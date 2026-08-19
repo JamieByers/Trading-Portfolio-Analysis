@@ -17,13 +17,16 @@ import java.util.ArrayList;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.tools.classfile.TypeAnnotation.Position;
 
 public class HttpServer {
     public List<CombinedPosition> combined_positions;
     public List<Position> positions;
+    public HttpClient client;
 
-    public HttpServer(List<Position> positions) {
+    public HttpServer(List<Position> positions, HttpClient client) {
         this.positions = positions;
+        this.client = client;
     }
 
     public void initialise() {
@@ -103,14 +106,17 @@ public class HttpServer {
                 break;
 
             default:
-                // not finding singular stocks
-                List<CombinedPosition> combinedPositionsSingle = getCombinedPositions(params);
-                CombinedPosition pos = linearSearch(split_path[0].substring(1), combinedPositionsSingle);
+                String ticker = split_path[0].substring(1);
+                Position pos = findPosition(ticker, positions);
+
                 if (pos == null) {
-                    writeResponse("Failed to find a position with ticker: " + path, writer);
+                    YahooPosition yp = getYahooInformation(ticker, params);
+                    CombinedPosition new_cp = new CombinedPosition(null, yp);
+                    writeResponse(new_cp.toJson(), writer);
                     break;
                 } else {
-                    writeResponse(pos.toJson(), writer);
+                    CombinedPosition new_cp = getCombinedPosition(pos, params);
+                    writeResponse(new_cp.toJson(), writer);
                     break;
                 }
         }
@@ -133,6 +139,16 @@ public class HttpServer {
 
         }
         return param_details;
+    }
+
+    public Position findPosition(String ticker, List<Position> positions) {
+        System.out.println("linear searchign " + ticker);
+        for ( Position pos : positions ) {
+            if (pos.ticker.contains(ticker)) {
+                return pos;
+            }
+        }
+        return null;
     }
 
     public CombinedPosition linearSearch(String ticker, List<CombinedPosition> combinedPositions) {
@@ -165,13 +181,13 @@ public class HttpServer {
         writer.write(message);
     }
 
-    public YahooPosition getYahooInformation(Position position, HttpClient client, HashMap<String, String> parameters) {
+    public YahooPosition getYahooInformation(String ticker, HashMap<String, String> parameters) {
 
         // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
 
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
-            + position.possibleYahooTicker
+            + ticker
             + "?"
             + parameters.getOrDefault("interval", "interval=1d")
             + "&"
@@ -183,10 +199,11 @@ public class HttpServer {
             .build();
 
         try {
-            HttpResponse<String> response = client.send(
+            HttpResponse<String> response = this.client.send(
                 request, HttpResponse.BodyHandlers.ofString()
             );
 
+            System.out.println(response);
             JSONObject json = new JSONObject(response.body());
             YahooPosition ypos = new YahooPosition(json);
 
@@ -199,15 +216,17 @@ public class HttpServer {
 
     }
 
+    public CombinedPosition getCombinedPosition(Position pos, HashMap<String, String> params) {
+        YahooPosition ypos = getYahooInformation(pos.possibleYahooTicker, params);
+        CombinedPosition combinedPosition = new CombinedPosition(pos, ypos);
+        return combinedPosition;
+    }
+
     public List<CombinedPosition> getCombinedPositions(HashMap<String, String> params) {
-        HttpClient client = HttpClient.newHttpClient();
-        List<YahooPosition> yahoo_data = new ArrayList<YahooPosition>();
         List<CombinedPosition> combined_positions = new ArrayList<CombinedPosition>();
         for (Position pos : this.positions) {
-            YahooPosition ypos = getYahooInformation(pos, client, params);
-            yahoo_data.add(ypos);
-            CombinedPosition combinedPosition = new CombinedPosition(pos, ypos);
-            combined_positions.add(combinedPosition);
+            CombinedPosition cp = getCombinedPosition(pos, params);
+            combined_positions.add(cp);
         }
 
         this.combined_positions = combined_positions;

@@ -1,7 +1,7 @@
 package jamie;
 
 import org.json.JSONObject;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -109,6 +109,10 @@ public class Position {
         lookup.put("f", ".F"); // AMS
 
         return lookup;
+    }
+
+    public String toJson() throws Exception {
+        return new ObjectMapper().writeValueAsString(this);
     }
 
 }

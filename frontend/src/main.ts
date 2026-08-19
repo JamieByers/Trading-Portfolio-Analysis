@@ -6,15 +6,21 @@ import { topChart } from "./charts/barChart.ts"
 import { portfolioOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
 
+let now = Date.now()
 
 let current_path = window.location.pathname.split("/")
+let params = window.location.search
 console.log(current_path)
+console.log(params)
 
 let path: string;
 if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
 
 let linegraph = echarts.init(document.getElementById("chart"));
+
+const loading = document.querySelector(".loading") as HTMLElement;
 let option = await createCandleStickGraph(path);
+loading.style.display = "none";
 
 linegraph.setOption(option);
 
@@ -51,3 +57,7 @@ let tmd = echarts.init(document.getElementById("topMoversToday"))
 let tm = await topMoversToday()
 
 tmd.setOption(tm)
+
+let then = Date.now()
+let elapsed = (then - now) / 1000
+console.log("Time Elapsed to fetch website: " + elapsed)

@@ -38,7 +38,12 @@ export async function createCandleStickGraph(ticker: string) {
             data: csg.data,
             yAxisIndex: 0,
             z: 1,
-        },
+            itemStyle: {
+                color0: "#ef232a",       // up
+                color: "#14b143",      // down
+                borderColor0: "#ef232a",
+                borderColor: "#14b143"
+            }},
 
         {
             name: "Change",
