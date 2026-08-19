@@ -5,8 +5,6 @@ import java.net.http.*;
 import java.util.Base64;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
 
 import org.json.*;
 
@@ -17,58 +15,11 @@ public class App {
         HttpClient client = HttpClient.newHttpClient();
         JSONArray json = getPortfolio(client);
         List<Position> positions = getPositionObjects(json);
-        List<YahooPosition> yahoo_data = new ArrayList<YahooPosition>();
-        List<CombinedPosition> combined_positions = new ArrayList<CombinedPosition>();
 
-        for (Position pos : positions) {
-            YahooPosition ypos = getYahooInformation(pos, client);
-            yahoo_data.add(ypos);
-            CombinedPosition combinedPosition = new CombinedPosition(pos, ypos);
-            combined_positions.add(combinedPosition);
-        }
-
-        HttpServer server = new HttpServer(combined_positions);
+        HttpServer server = new HttpServer(positions);
         server.initialise();
     }
 
-    public static YahooPosition getYahooInformation(Position position, HttpClient client) {
-
-        // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
-        Map<String, String> parameters = Map.of(
-            "interval", "interval=1d",
-            "range", "range=1wk"
-        );
-
-
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
-            + position.possibleYahooTicker
-            + "?"
-            + parameters.get("interval")
-            + "&"
-            + parameters.get("range"))
-            )
-            .header("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
-            .header("Accept", "application/json")
-            .GET()
-            .build();
-
-        try {
-            HttpResponse<String> response = client.send(
-                request, HttpResponse.BodyHandlers.ofString()
-            );
-
-            JSONObject json = new JSONObject(response.body());
-            YahooPosition ypos = new YahooPosition(json);
-
-            return ypos;
-
-        } catch (Exception e) {
-            String message = "YahooPosition fetch error";
-            throw new RuntimeException(message + e);
-        }
-
-    }
 
     static public List<Position> getPositionObjects(JSONArray json) {
         List<Position> positions = new ArrayList<Position>();
