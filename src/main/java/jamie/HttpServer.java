@@ -6,6 +6,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.json.JSONArray;
@@ -61,7 +62,8 @@ public class HttpServer {
         }
     }
 
-    public void route(String path, BufferedWriter writer) throws Exception {
+    public HashMap<String, String> route(String path, BufferedWriter writer) throws Exception {
+        HashMap<String, String> param_details = handleParams(path);
         switch (path) {
             case "/coffee":
                 writeResponse("Coffee!!!!", writer);
@@ -84,6 +86,29 @@ public class HttpServer {
                     break;
                 }
         }
+
+        return param_details;
+    }
+
+    public HashMap<String, String> handleParams(String path) {
+        String[] split_path = path.split("\\?");
+        HashMap<String, String> param_details = new HashMap<String, String>();
+
+        if (split_path.length > 1) {
+            String params = split_path[1];
+
+            String[] split_params = params.split("\\&");
+
+            for (String param : split_params) {
+                String[] split_param = param.split("\\=");
+                String paramater = split_param[0];
+                String value = split_params[1];
+
+                param_details.put(paramater, value);
+            }
+
+        }
+        return param_details;
     }
 
     public CombinedPosition linearSearch(String ticker) {
