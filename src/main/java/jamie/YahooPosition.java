@@ -52,7 +52,7 @@ public class YahooPosition {
 
 
         // meta
-        this.name = meta.getString("longName");
+        this.name = meta.optString("longName", meta.optString("shortName", this.ticker));
         this.ticker = meta.getString("symbol");
         this.timezone = meta.getString("timezone");
         this.range = meta.getString("range");
@@ -88,14 +88,8 @@ public class YahooPosition {
                 double change = (close.getDouble(i) - open.getDouble(i));
                 priceChange = Double.toString(change);
 
-                boolean negative = false;
-                if (change < 0) {
-                    change *= -1;
-                    negative = true ;
-                }
 
                 double pcp = ((double) change / (double) open.getDouble(i)) * 100;
-                if (negative) { pcp *= -1; }
 
                 current_timestamp.priceChange = change;
                 current_timestamp.priceChangePercentage = pcp;

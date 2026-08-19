@@ -27,8 +27,6 @@ public class App {
             combined_positions.add(combinedPosition);
         }
 
-        // combined_positions.get(1).print();
-
         HttpServer server = new HttpServer(combined_positions);
         server.initialise();
     }
@@ -37,8 +35,8 @@ public class App {
 
         // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
         Map<String, String> parameters = Map.of(
-            "interval", "interval=1h",
-            "range", "range=1mo"
+            "interval", "interval=1d",
+            "range", "range=1wk"
         );
 
 
@@ -66,7 +64,8 @@ public class App {
             return ypos;
 
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            String message = "YahooPosition fetch error";
+            throw new RuntimeException(message + e);
         }
 
     }
