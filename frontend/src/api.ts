@@ -4,16 +4,18 @@ type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
-    let url = "/api"
+    let url = "http://localhost:8080/api"
 
     if (cache.get(path) != null) { return cache.get(path) }
 
     const response = await fetch(url+path);
+    console.log(response)
     if (!response.ok) {
         throw new Error
     }
 
     let json = await response.json();
+    console.log(json)
 
     cache.set(path, json)
 
