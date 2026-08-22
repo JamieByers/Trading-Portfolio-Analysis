@@ -16,13 +16,25 @@ console.log(params)
 let path: string;
 if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
 
-let linegraph = echarts.init(document.getElementById("chart"));
+let mainCandleStickGraph = echarts.init(document.getElementById("chart"));
 
 const loading = document.querySelector(".loading") as HTMLElement;
 let option = await createCandleStickGraph(path);
 loading.style.display = "none";
 
-linegraph.setOption(option);
+mainCandleStickGraph.setOption(option);
+
+let primaryTickerInput = document.getElementById("primaryTickerInput") as HTMLInputElement
+let primaryRangeInput = document.getElementById("primaryRangeInput") as HTMLInputElement
+let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HTMLInputElement
+
+
+[primaryTickerInput, primaryRangeInput, primaryIntervalInput].forEach((el: HTMLInputElement) => {
+    el.addEventListener("input", async () => {
+        await resetCandleGraph(primaryTickerInput.value, primaryRangeInput.value, primaryIntervalInput.value, mainCandleStickGraph)
+    })
+});
+
 
 
 let pieChart = echarts.init(document.getElementById("pieChart"))
@@ -43,21 +55,80 @@ let pot = await portfolioOverTime()
 portfolioOvertime.setOption(pot)
 
 
-let twd = echarts.init(document.getElementById("topWinnersToday"))
+let topWinnersTodayChart = echarts.init(document.getElementById("topWinnersToday"))
 let tt = await topWinnersToday()
 
-twd.setOption(tt)
+topWinnersTodayChart.setOption(tt)
 
-let tld = echarts.init(document.getElementById("topLosersToday"))
+let topLosersTodayChart = echarts.init(document.getElementById("topLosersToday"))
 let tl = await topLosersToday()
 
-tld.setOption(tl)
+topLosersTodayChart.setOption(tl)
 
-let tmd = echarts.init(document.getElementById("topMoversToday"))
+let topMoversTodayChart = echarts.init(document.getElementById("topMoversToday"))
 let tm = await topMoversToday()
 
-tmd.setOption(tm)
+topMoversTodayChart.setOption(tm)
 
 let then = Date.now()
 let elapsed = (then - now) / 1000
 console.log("Time Elapsed to fetch website: " + elapsed)
+
+
+
+let compare1 = document.getElementById("compareInput1") as HTMLInputElement
+let compare2 = document.getElementById("compareInput2") as HTMLInputElement
+
+let range1 = document.getElementById("rangeInput1") as HTMLInputElement
+let range2 = document.getElementById("rangeInput2") as HTMLInputElement
+
+let interval1 = document.getElementById("intervalInput1") as HTMLInputElement
+let interval2 = document.getElementById("intervalInput2") as HTMLInputElement
+
+let compareTickerValue1 = compare1.value || "SNDK"
+let compareTickerValue2 = compare2.value || "ASML"
+
+let candleCompare1 = echarts.init(document.getElementById("compareLeft"));
+let cc1o = await createCandleStickGraph(compareTickerValue1);
+candleCompare1.setOption(cc1o);
+
+let candleCompare2 = echarts.init(document.getElementById("compareRight"));
+let cc2o = await createCandleStickGraph(compareTickerValue2);
+candleCompare2.setOption(cc2o);
+
+async function resetCandleGraph(ticker: string, range: string, interval: string, chart: echarts.ECharts) {
+    ticker = ticker || "SNDK"
+    range = range || "1mo"
+    interval = interval || "1d"
+
+    let path: string = ticker + "?range=" + range + "&interval=" + interval
+    console.log(path)
+
+    let option = await createCandleStickGraph(path);
+    chart.setOption(option)
+}
+
+[compare1, range1, interval1].forEach((el: HTMLInputElement) => {
+    el.addEventListener("input", async () => {
+        await resetCandleGraph(compare1.value, range1.value, interval1.value, candleCompare1)
+    })
+});
+
+[compare2, range2, interval2].forEach((el: HTMLInputElement) => {
+    el.addEventListener("input", async () => {
+        await resetCandleGraph(compare2.value, range2.value, interval2.value, candleCompare2)
+    })
+});
+
+
+window.addEventListener("resize", () => {
+    mainCandleStickGraph.resize()
+    pieChart.resize()
+    topLosersChartElement.resize()
+    portfolioOvertime.resize()
+    topWinnersTodayChart.resize()
+    topLosersTodayChart.resize()
+    topMoversTodayChart.resize()
+    candleCompare1.resize()
+    candleCompare2.resize()
+})

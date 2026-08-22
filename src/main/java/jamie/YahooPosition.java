@@ -77,12 +77,19 @@ public class YahooPosition {
         String priceChangePercentage;
 
         for (int i = 0; i < close.length(); i++) {
+            if (open.isNull(i) ||
+                close.isNull(i) ||
+                low.isNull(i) ||
+                high.isNull(i)) {
+                continue;
+            }
+
             TimestampElement current_timestamp = new TimestampElement(
                 timestamp.get(i).toString(),
-                open.isNull(i) ? -1.0 : open.getDouble(i),
-                close.isNull(i) ? -1.0 : close.getDouble(i),
-                low.isNull(i) ? -1.0 : low.getDouble(i),
-                high.isNull(i) ? -1.0 : high.getDouble(i)
+                open.getDouble(i),
+                close.getDouble(i),
+                low.getDouble(i),
+                high.getDouble(i)
             );
 
             if (!close.isNull(i) && !open.isNull(i)) {

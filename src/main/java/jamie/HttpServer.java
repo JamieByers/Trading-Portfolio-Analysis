@@ -1,5 +1,7 @@
 package jamie;
 
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -8,16 +10,17 @@ import java.net.*;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
+import java.util.regex.*;
 
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sun.tools.classfile.TypeAnnotation.Position;
 
 public class HttpServer {
     public List<CombinedPosition> combined_positions;
@@ -182,16 +185,80 @@ public class HttpServer {
     }
 
     public YahooPosition getYahooInformation(String ticker, HashMap<String, String> parameters) {
+        System.out.println(parameters);
 
         // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
 
+        String input_timestamp = parameters.getOrDefault("timestamp", parameters.getOrDefault("ts", "")); // example ts: 19-07-26
+        String range = parameters.getOrDefault("range", "range=1mo");
+
+        // TODO: figure out this silly custom timestamping
+        if (input_timestamp != "") {
+            String custom_timestamp = input_timestamp.split("=")[1];
+            System.out.println(custom_timestamp);
+
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy");
+            LocalDate date = LocalDate.parse(custom_timestamp, formatter);
+            System.out.println(date);
+
+            Instant start = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
+            Instant end = Instant.now();
+
+            long minimum_range = Duration.between(start, end).toDays();
+            System.out.println(minimum_range);
+
+            String range_time = range.split("=")[1];
+            System.out.println(range_time);
+
+            Pattern pattern = Pattern.compile("(\\d+)(mo|wk|m|d|h)");
+            Matcher matcher = pattern.matcher(range_time);
+
+            if (matcher.matches()) {
+                long range_value = Integer.parseInt(matcher.group(1));
+                String range_period = matcher.group(2);
+                System.out.println(range_value + " " + range_period);
+
+                double mult = 0;
+                switch (range_period) {
+                    case "mo":
+                        mult = 31;
+                        break;
+                    case "wk":
+                        mult = 7;
+                        break;
+                    case "d":
+                        mult = 1;
+                        break;
+                    case "h":
+                        mult = 1 / 24;
+                        break;
+                    case "m":
+                        mult = 1 / 1440;
+                        break;
+                }
+
+                double current_value = range_value * mult;
+                System.out.println("current val "+ current_value + " " + mult);
+                if (mult > 0 && minimum_range > current_value) {
+                    minimum_range -= Math.floor(minimum_range / 7) * 2 ;
+                    range = "range=" + minimum_range + "d";
+                    System.out.println(range);
+                }
+
+            }
+
+        }
+
+
+        System.out.println("range used: " + range);
         HttpRequest request = HttpRequest.newBuilder()
             .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
             + ticker
             + "?"
             + parameters.getOrDefault("interval", "interval=1d")
             + "&"
-            + parameters.getOrDefault("range", "range=1mo"))
+            + range
+            )
             )
             .header("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
             .header("Accept", "application/json")

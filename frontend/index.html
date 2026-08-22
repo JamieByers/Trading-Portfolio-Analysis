@@ -16,11 +16,15 @@
         <div id="chart" class=""></div>
     </section>
 
-    <section id="stockInfo">
-
+    <section id="infoBar">
+        <div id="primaryInputBar" class="inputBar">
+            <input type="text" name="" value="" id="primaryTickerInput" class="inputElement" placeholder="Stock Ticker 1: SNDK">
+            <input type="text" name="" value="" id="primaryRangeInput" class="inputElement" placeholder="Range: 1mo">
+            <input type="text" name="" value="" id="primaryIntervalInput" class="inputElement" placeholder="Interval: 1d">
+         </div>
     </section>
 
-    <section id="extraInfo">
+    <section class="extraInfo">
         <section id="pieChartSection">
             <div id="pieChart" class="box"></div>
         </section>
@@ -36,7 +40,7 @@
     </section>
 
 
-    <section id="extraInfo">
+    <section class="extraInfo">
         <section id="pieChartSection">
             <div id="topWinnersToday" class="box"></div>
         </section>
@@ -50,6 +54,28 @@
         </section>
     </section>
 
+
+    <section class="extraInfo">
+        <div id="compareLeft" class="box"></div>
+        <div id="compareRight" class="box"></div>
+    </section>
+
+    <section id="infoBar">
+        <!-- Add stock info for each under the search bar? -->
+        <div id="cbar1" class="inputBar">
+            <input type="text" name="" value="" id="compareInput1" class="inputElement" placeholder="Stock Ticker 1: SNDK">
+            <input type="text" name="" value="" id="rangeInput1" class="inputElement" placeholder="Range: 1mo">
+            <input type="text" name="" value="" id="intervalInput1" class="inputElement" placeholder="Interval: 1d">
+         </div>
+        <div id="cbar2" class="inputBar">
+            <input type="text" name="" value="" id="compareInput2" class="inputElement" placeholder="Stock Ticker 2: ASML">
+            <input type="text" name="" value="" id="rangeInput2" class="inputElement" placeholder="Range: 1mo">
+            <input type="text" name="" value="" id="intervalInput2" class="inputElement" placeholder="Interval: 1d">
+        </div>
+    </section>
+
+
     <script type="module" src="/src/main.ts"></script>
   </body>
+
 </html>
