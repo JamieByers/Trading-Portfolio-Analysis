@@ -102,6 +102,7 @@ export async function profitOverTime() {
             name: cp.position.name,
             type: "line",
             data: [],
+            showSymbol: false,
             emphasis: {
                 focus: "series"
             }
@@ -130,6 +131,10 @@ export async function profitOverTime() {
         },
         xAxis: {
             type: "time",
+            axisLabel: {
+                hideOverlap: true,
+                interval: "auto"
+            }
         },
 
         tooltip: {
@@ -143,6 +148,7 @@ export async function profitOverTime() {
                 name: "Total Profit",
                 data: totalProfitData,
                 type: "line",
+                showSymbol: false,
 
                 lineStyle: {
                     winth: 4
@@ -154,7 +160,21 @@ export async function profitOverTime() {
                 }
 
             },
+        ],
 
+        dataZoom: [
+            {
+                type: "inside",
+                start: 0,
+                end: 100
+            },
+            {
+                type: "slider",
+                start: 0,
+                end: 100,
+                height: 20,
+                bottom: 5
+            }
         ]
     }
 
