@@ -1,7 +1,7 @@
 import { getDetailedTicker } from "../api";
 
-export async function createCandleStickGraph(ticker: string) {
-    let csg = await getDetailedTicker(ticker)
+export async function createCandleStickGraph(ticker: string, params?) {
+    let csg = await getDetailedTicker(ticker, params || "")
     let ypos = csg.full_data.yahooPosition
     console.log(csg.changes)
 

@@ -70,7 +70,7 @@ export async function createLineGraph() {
 
     for (let line of lines)  {
         series.push({
-            data: line.changes,
+            series: line.changes,
             type: 'line'
         })
     }
@@ -78,7 +78,7 @@ export async function createLineGraph() {
     let option = {
       xAxis: {
         type: 'category',
-        data: timestamps
+        series: timestamps
       },
       yAxis: {
         type: 'value'
@@ -89,3 +89,78 @@ export async function createLineGraph() {
 
     return option
 }
+
+
+export async function profitOverTime() {
+    let all_data = await getData("/profit-over-time")
+
+    let series = [];
+    let profitMap = new Map<string, number>();
+
+    for (let cp of all_data) {
+        let ticker_data = {
+            name: cp.position.name,
+            type: "line",
+            data: [],
+            emphasis: {
+                focus: "series"
+            }
+        }
+
+        for (let te of cp.yahooPosition.timestamp_elements) {
+            let ts = te.timestamp.split("[")[0]
+            ticker_data.data.push([ts, te.profit])
+            if (profitMap.has(ts)) {
+                profitMap.set(ts, profitMap.get(ts)! + te.profit);
+            } else {
+                profitMap.set(ts, te.profit);
+            }
+        }
+        series.push(ticker_data)
+    }
+
+    let totalProfitData = [...profitMap.entries()].sort(([a], [b]) => a.localeCompare(b));
+
+    let option = {
+        title: {
+            text: "Profit Over Time"
+        },
+        yAxis: {
+            type: "value"
+        },
+        xAxis: {
+            type: "time",
+        },
+
+        tooltip: {
+            trigger: "axis"
+        },
+
+        series: [
+            ...series,
+
+            {
+                name: "Total Profit",
+                data: totalProfitData,
+                type: "line",
+
+                lineStyle: {
+                    winth: 4
+                },
+                z: 10,
+
+                emphasis: {
+                    focus: "series"
+                }
+
+            },
+
+        ]
+    }
+
+    console.log(option)
+
+    return option
+}
+
+

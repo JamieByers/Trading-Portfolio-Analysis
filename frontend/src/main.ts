@@ -3,8 +3,9 @@ import * as echarts from "echarts";
 import { createCandleStickGraph } from "./charts/candleStickGraph.ts"
 import { createPieChart } from "./charts/pieChart.ts"
 import { topChart } from "./charts/barChart.ts"
-import { portfolioOverTime } from "./charts/lineChart.ts"
+import { portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
+import { generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
 
 let now = Date.now()
 
@@ -19,7 +20,7 @@ if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
 let mainCandleStickGraph = echarts.init(document.getElementById("chart"));
 
 const loading = document.querySelector(".loading") as HTMLElement;
-let option = await createCandleStickGraph(path);
+let option = await createCandleStickGraph(path, "?range=1mo&interval=1d");
 loading.style.display = "none";
 
 mainCandleStickGraph.setOption(option);
@@ -51,7 +52,6 @@ topLosersChartElement.setOption(tlc_option)
 
 let portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
 let pot = await portfolioOverTime()
-
 portfolioOvertime.setOption(pot)
 
 
@@ -121,6 +121,14 @@ async function resetCandleGraph(ticker: string, range: string, interval: string,
 });
 
 
+// let holdingTimeAndReturn = echarts.init(document.getElementById("holdingTimeAndReturn"))
+// let holdingTimeAndReturnOption = await generateScatterPlotHoldingTimeUpl();
+// holdingTimeAndReturn.setOption(holdingTimeAndReturnOption)
+
+let profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime"))
+let profitOverTimeOption = await profitOverTime();
+profitOverTimeGraph.setOption(profitOverTimeOption)
+
 window.addEventListener("resize", () => {
     mainCandleStickGraph.resize()
     pieChart.resize()
@@ -131,4 +139,6 @@ window.addEventListener("resize", () => {
     topMoversTodayChart.resize()
     candleCompare1.resize()
     candleCompare2.resize()
+    // holdingTimeAndReturn.resize()
+    portfolioOvertime.resize()
 })
