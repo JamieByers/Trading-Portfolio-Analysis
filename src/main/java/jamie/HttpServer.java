@@ -106,20 +106,23 @@ public class HttpServer {
         System.out.println();
     }
 
+    // TODO: Fix this whole routing system to work with the server /api is messing with it
     public void route(String path, BufferedWriter writer) throws Exception {
-        String[] split_route = path.split("\\/");
-
-        String[] sp = split_route;
-        if (split_route.length > 1 && split_route[1].equalsIgnoreCase("api")) {
-            sp = Arrays.copyOfRange(split_route, 2, split_route.length);
+        // /api/all?range=...&interval=...
+        String route = path;
+        if (path.startsWith("/api")) {
+            route = route.substring(4);
         }
 
-        String[] split_path = (sp[0]).split("\\?");
+        // /all?range=...&interval=...
+        String[] split_path = route.split("\\?");
 
+        // ["/all", "range=...&interval=..."]
+        String matching_path = split_path[0];
         HashMap<String, String> params = handleParams(split_path);
-        String ticker = split_path[0];
 
-        switch ("/" + split_path[0]) {
+        // "/all"
+        switch (matching_path) {
             case "/coffee":
                 writeResponse("Coffee!!!!", writer);
                 break;
