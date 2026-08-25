@@ -1,6 +1,7 @@
-/home/opc/trading/src/main/java/jamie/App.java
-/home/opc/trading/src/main/java/jamie/CombinedPosition.java
-/home/opc/trading/src/main/java/jamie/HttpServer.java
-/home/opc/trading/src/main/java/jamie/Position.java
-/home/opc/trading/src/main/java/jamie/TimestampElement.java
-/home/opc/trading/src/main/java/jamie/YahooPosition.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/App.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/CombinedPosition.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/HttpServer.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/PortfolioHistory.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/Position.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/TimestampElement.java
+/Users/jamiebyers/Documents/Code/Projects/TradingPortfolioAnalysis/server.jamie/src/main/java/jamie/YahooPosition.java

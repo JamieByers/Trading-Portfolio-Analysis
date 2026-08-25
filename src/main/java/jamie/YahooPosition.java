@@ -71,11 +71,6 @@ public class YahooPosition {
         this.close = quote.getJSONArray("close");
         this.open = quote.getJSONArray("open");
 
-
-        String priceChange;
-        String priceFlux;
-        String priceChangePercentage;
-
         for (int i = 0; i < close.length(); i++) {
             if (open.isNull(i) ||
                 close.isNull(i) ||
@@ -91,32 +86,6 @@ public class YahooPosition {
                 low.getDouble(i),
                 high.getDouble(i)
             );
-
-            if (!close.isNull(i) && !open.isNull(i)) {
-                double change = (close.getDouble(i) - open.getDouble(i));
-                priceChange = Double.toString(change);
-
-
-                double pcp = ((double) change / (double) open.getDouble(i)) * 100;
-
-                current_timestamp.priceChange = change;
-                current_timestamp.priceChangePercentage = pcp;
-                priceChangePercentage = String.format(" (%.2f%%)", pcp);
-                current_timestamp.percentageMessage = priceChangePercentage;
-
-            } else {
-                priceChange = "Error";
-                priceChangePercentage = "";
-            }
-
-
-            if (!high.isNull(i) && !low.isNull(i)) {
-                double flux = (high.getDouble(i) - low.getDouble(i));
-                priceFlux = Double.toString(flux);
-                current_timestamp.priceFlux = flux;
-            } else {
-                priceFlux = "Error";
-            }
 
             this.timestamp_elements.add(current_timestamp);
         }

@@ -16,20 +16,28 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.regex.*;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+record PriceChangeToday(String timestamp, double runningTotal) {};
 
 public class HttpServer {
     public List<CombinedPosition> combined_positions;
     public List<Position> positions;
     public HttpClient client;
+    public String oldest_pos;
 
     public HttpServer(List<Position> positions, HttpClient client) {
         this.positions = positions;
         this.client = client;
+        this.combined_positions = null;
+        this.oldest_pos = null;
     }
 
     public void initialise() {
@@ -91,11 +99,27 @@ public class HttpServer {
         }
     }
 
+    public void print(String[] l) {
+        for ( String el : l ) {
+            System.out.println(el);
+        }
+        System.out.println();
+    }
+
     public void route(String path, BufferedWriter writer) throws Exception {
-        String[] split_path = path.split("\\?");
+        String[] split_route = path.split("\\/");
+
+        String[] sp = split_route;
+        if (split_route.length > 1 && split_route[1].equalsIgnoreCase("api")) {
+            sp = Arrays.copyOfRange(split_route, 2, split_route.length);
+        }
+
+        String[] split_path = (sp[0]).split("\\?");
+
         HashMap<String, String> params = handleParams(split_path);
-        System.out.println("path"+split_path[0]);
-        switch (split_path[0]) {
+        String ticker = split_path[0];
+
+        switch ("/" + split_path[0]) {
             case "/coffee":
                 writeResponse("Coffee!!!!", writer);
                 break;
@@ -103,13 +127,43 @@ public class HttpServer {
             case "/all":
                 ObjectMapper mapper = new ObjectMapper();
                 List<CombinedPosition> combinedPositionsAll = getCombinedPositions(params);
+                this.combined_positions = combinedPositionsAll;
                 String json = mapper.writeValueAsString(combinedPositionsAll);
 
                 writeResponse(json.toString(), writer);
                 break;
 
+            case "/profit-over-time":
+                List<CombinedPosition> cps = new ArrayList<>();
+                for ( Position p : this.positions ) {
+                    HashMap<String, String> params_map = new HashMap<>();
+                    params_map.put("range", "range="+p.holdingTime+"d");
+                    params_map.put("interval", "interval=1d");
+
+                    YahooPosition yp = getYahooInformation(p.possibleYahooTicker, params_map);
+                    CombinedPosition cp = new CombinedPosition(p, yp);
+
+                    double runningTotal = p.totalCost;
+
+                    for (TimestampElement te : yp.timestamp_elements) {
+                        double priceChangePercentageAbsolute = te.priceChangePercentage / 100;
+                        double change = 1 + priceChangePercentageAbsolute;
+                        runningTotal *= change;
+
+                        te.profit = runningTotal - p.totalCost;
+                    }
+
+                    cps.add(cp);
+                }
+
+                ObjectMapper m = new ObjectMapper();
+                String cpsJson = m.writeValueAsString(cps);
+
+                writeResponse(cpsJson, writer);
+
+                break;
+
             default:
-                String ticker = split_path[0].substring(1);
                 Position pos = findPosition(ticker, positions);
 
                 if (pos == null) {
@@ -124,6 +178,9 @@ public class HttpServer {
                 }
         }
     }
+
+
+
 
     public HashMap<String, String> handleParams(String[] split_path) {
         HashMap<String, String> param_details = new HashMap<String, String>();
@@ -145,7 +202,7 @@ public class HttpServer {
     }
 
     public Position findPosition(String ticker, List<Position> positions) {
-        System.out.println("linear searchign " + ticker);
+        System.out.println("linear searching " + ticker);
         for ( Position pos : positions ) {
             if (pos.ticker.contains(ticker)) {
                 return pos;

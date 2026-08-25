@@ -20,4 +20,5 @@ public class CombinedPosition {
         return new ObjectMapper().writeValueAsString(this);
     }
 
+
 }
