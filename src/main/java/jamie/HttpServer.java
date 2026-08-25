@@ -167,10 +167,10 @@ public class HttpServer {
                 break;
 
             default:
-                Position pos = findPosition(ticker, positions);
+                Position pos = findPosition(matching_path, positions);
 
                 if (pos == null) {
-                    YahooPosition yp = getYahooInformation(ticker, params);
+                    YahooPosition yp = getYahooInformation(matching_path, params);
                     CombinedPosition new_cp = new CombinedPosition(null, yp);
                     writeResponse(new_cp.toJson(), writer);
                     break;
@@ -205,6 +205,7 @@ public class HttpServer {
     }
 
     public Position findPosition(String ticker, List<Position> positions) {
+        ticker = ticker.substring(1);
         System.out.println("linear searching " + ticker);
         for ( Position pos : positions ) {
             if (pos.ticker.contains(ticker)) {
