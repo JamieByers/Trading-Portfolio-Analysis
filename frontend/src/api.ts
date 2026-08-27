@@ -10,6 +10,7 @@ export async function getData(path: string) {
     if (cache.get(path) != null) { return cache.get(path) }
 
     const response = await fetch(url+path);
+    console.log("response")
     console.log(response)
     if (!response.ok) {
         throw new Error
