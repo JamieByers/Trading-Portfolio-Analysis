@@ -1,9 +1,9 @@
-jamie/CombinedPosition.class
 jamie/TimestampElement.class
 jamie/PriceChangeToday.class
 jamie/Position.class
 jamie/PortfolioHistory.class
 jamie/HttpServer.class
-jamie/HttpServer$Request.class
 jamie/App.class
+jamie/CombinedPosition.class
+jamie/HttpServer$Request.class
 jamie/YahooPosition.class

@@ -5,6 +5,7 @@ let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
     let url = "/api"
+    // let url = "http://localhost:8080/api"
 
     if (cache.get(path) != null) { return cache.get(path) }
 

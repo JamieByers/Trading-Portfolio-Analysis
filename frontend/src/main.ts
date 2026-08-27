@@ -2,10 +2,10 @@ import * as echarts from "echarts";
 
 import { createCandleStickGraph } from "./charts/candleStickGraph.ts"
 import { createPieChart } from "./charts/pieChart.ts"
-import { topChart } from "./charts/barChart.ts"
+import { generateVolatilityGraph, topChart } from "./charts/barChart.ts"
 import { portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
-import { generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
+import { generateRiskReturnScatterplot, generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
 
 let now = Date.now()
 
@@ -35,8 +35,6 @@ let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HT
         await resetCandleGraph(primaryTickerInput.value, primaryRangeInput.value, primaryIntervalInput.value, mainCandleStickGraph)
     })
 });
-
-
 
 let pieChart = echarts.init(document.getElementById("pieChart"))
 let pie_option = await createPieChart()
@@ -69,11 +67,6 @@ let topMoversTodayChart = echarts.init(document.getElementById("topMoversToday")
 let tm = await topMoversToday()
 
 topMoversTodayChart.setOption(tm)
-
-let then = Date.now()
-let elapsed = (then - now) / 1000
-console.log("Time Elapsed to fetch website: " + elapsed)
-
 
 
 let compare1 = document.getElementById("compareInput1") as HTMLInputElement
@@ -129,6 +122,14 @@ let profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime")
 let profitOverTimeOption = await profitOverTime();
 profitOverTimeGraph.setOption(profitOverTimeOption)
 
+let volatilityOverTime = echarts.init(document.getElementById("volatilityOverTime"))
+let volatilityOverTimeOption = await generateVolatilityGraph();
+volatilityOverTime.setOption(volatilityOverTimeOption)
+
+let riskReturnGraph = echarts.init(document.getElementById("riskReturnGraph"))
+let riskReturnGraphOption = await generateRiskReturnScatterplot();
+riskReturnGraph.setOption(riskReturnGraphOption)
+
 window.addEventListener("resize", () => {
     mainCandleStickGraph.resize()
     pieChart.resize()
@@ -139,6 +140,11 @@ window.addEventListener("resize", () => {
     topMoversTodayChart.resize()
     candleCompare1.resize()
     candleCompare2.resize()
-    // holdingTimeAndReturn.resize()
     portfolioOvertime.resize()
+    volatilityOverTime.resize()
+    riskReturnGraph.resize()
 })
+
+let then = Date.now()
+let elapsed = (then - now) / 1000
+console.log("Time Elapsed to fetch website: " + elapsed)

@@ -15,12 +15,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Comparator;
 import java.util.regex.*;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -33,11 +31,18 @@ public class HttpServer {
     public HttpClient client;
     public String oldest_pos;
 
+    public Cache<String> cache;
+    public Cache<YahooPosition> yahooCache;
+
+    private final ObjectMapper mapper = new ObjectMapper();
+
     public HttpServer(List<Position> positions, HttpClient client) {
         this.positions = positions;
         this.client = client;
         this.combined_positions = null;
         this.oldest_pos = null;
+        this.cache = new Cache<String>();
+        this.yahooCache = new Cache<YahooPosition>();
     }
 
     public void initialise() {
@@ -108,6 +113,12 @@ public class HttpServer {
 
     // TODO: Fix this whole routing system to work with the server /api is messing with it
     public void route(String path, BufferedWriter writer) throws Exception {
+        String cache = this.cache.getFromCache(path);
+        if (cache != null) {
+            writeResponse(cache, writer);
+            return;
+        }
+
         // /api/all?range=...&interval=...
         String route = path;
         if (path.startsWith("/api")) {
@@ -121,6 +132,7 @@ public class HttpServer {
         String matching_path = split_path[0];
         HashMap<String, String> params = handleParams(split_path);
 
+
         // "/all"
         switch (matching_path) {
             case "/coffee":
@@ -128,11 +140,11 @@ public class HttpServer {
                 break;
 
             case "/all":
-                ObjectMapper mapper = new ObjectMapper();
                 List<CombinedPosition> combinedPositionsAll = getCombinedPositions(params);
                 this.combined_positions = combinedPositionsAll;
                 String json = mapper.writeValueAsString(combinedPositionsAll);
 
+                this.cache.addToCache(path, json);
                 writeResponse(json.toString(), writer);
                 break;
 
@@ -159,9 +171,9 @@ public class HttpServer {
                     cps.add(cp);
                 }
 
-                ObjectMapper m = new ObjectMapper();
-                String cpsJson = m.writeValueAsString(cps);
+                String cpsJson = mapper.writeValueAsString(cps);
 
+                this.cache.addToCache(path, cpsJson);
                 writeResponse(cpsJson, writer);
 
                 break;
@@ -172,11 +184,17 @@ public class HttpServer {
                 if (pos == null) {
                     YahooPosition yp = getYahooInformation(matching_path, params);
                     CombinedPosition new_cp = new CombinedPosition(null, yp);
-                    writeResponse(new_cp.toJson(), writer);
+                    String new_cp_json = new_cp.toJson();
+
+                    this.cache.addToCache(path, new_cp_json);
+                    writeResponse(new_cp_json, writer);
                     break;
                 } else {
                     CombinedPosition new_cp = getCombinedPosition(pos, params);
-                    writeResponse(new_cp.toJson(), writer);
+                    String new_cp_json = new_cp.toJson();
+
+                    this.cache.addToCache(path, new_cp_json);
+                    writeResponse(new_cp_json, writer);
                     break;
                 }
         }
@@ -238,7 +256,7 @@ public class HttpServer {
 
     public void writeResponse(String message, BufferedWriter writer) throws Exception {
         writer.write("HTTP/1.1 200 OK\r\n");
-        writer.write("Content-Type: text/plain\r\n");
+        writer.write("Content-Type: application/json\r\n");
         writer.write("Access-Control-Allow-Origin: *\r\n");
         writer.write("Content-Length: " + message.length() + "\r\n");
         writer.write("\r\n");
@@ -311,14 +329,20 @@ public class HttpServer {
         }
 
 
-        System.out.println("range used: " + range);
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
-            + ticker
+        String api_path = ticker
             + "?"
             + parameters.getOrDefault("interval", "interval=1d")
             + "&"
-            + range
+            + range;
+
+        YahooPosition cache_hit = this.yahooCache.getFromCache(api_path);
+        if (cache_hit != null) {
+            return cache_hit;
+        }
+
+        HttpRequest request = HttpRequest.newBuilder()
+            .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
+            + api_path
             )
             )
             .header("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
@@ -335,6 +359,7 @@ public class HttpServer {
             JSONObject json = new JSONObject(response.body());
             YahooPosition ypos = new YahooPosition(json);
 
+            this.yahooCache.addToCache(api_path, ypos);
             return ypos;
 
         } catch (Exception e) {
@@ -352,9 +377,28 @@ public class HttpServer {
 
     public List<CombinedPosition> getCombinedPositions(HashMap<String, String> params) {
         List<CombinedPosition> combined_positions = new ArrayList<CombinedPosition>();
+        List<Thread> threads = new ArrayList<>();
+
         for (Position pos : this.positions) {
-            CombinedPosition cp = getCombinedPosition(pos, params);
-            combined_positions.add(cp);
+
+            Thread thread = new Thread(() -> {
+                CombinedPosition cp = getCombinedPosition(pos, params);
+
+                synchronized (combined_positions) {
+                    combined_positions.add(cp);
+                }
+            });
+
+            threads.add(thread);
+            thread.start();
+        }
+
+        for (Thread thread : threads) {
+            try {
+                thread.join();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
         }
 
         this.combined_positions = combined_positions;

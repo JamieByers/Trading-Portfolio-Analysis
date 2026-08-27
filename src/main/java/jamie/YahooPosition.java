@@ -25,6 +25,8 @@ public class YahooPosition {
     public JSONArray close;
     public JSONArray open;
 
+    double volatility;
+
     public List<String> timestamp;
     public List<TimestampElement> timestamp_elements;
     public String firstTradeDate;
@@ -153,4 +155,5 @@ public class YahooPosition {
     public String toJson() throws Exception {
         return new ObjectMapper().writeValueAsString(this);
     }
+
 }

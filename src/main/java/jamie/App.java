@@ -16,8 +16,6 @@ public class App {
 
         List<Position> positions = getPositionObjects(client);
 
-        // getPortfolioHistory(client);
-
         HttpServer server = new HttpServer(positions, client);
         server.initialise();
     }

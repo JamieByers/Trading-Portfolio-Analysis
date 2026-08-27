@@ -1,4 +1,5 @@
 import { getData } from "../api";
+import { calculateSD } from "./analysis";
 
 export async function generateScatterPlotHoldingTimeUpl() {
     let all_data = await getData("/all");
@@ -52,4 +53,49 @@ export async function generateScatterPlotHoldingTimeUpl() {
 
     return option;
 
+}
+
+
+
+export async function generateRiskReturnScatterplot() {
+    let pot = await getData("/profit-over-time")
+    let points = []
+
+    for (let cp of pot) {
+        let timestamp_elements = cp.yahooPosition.timestamp_elements
+        let volatility = calculateSD(timestamp_elements)
+        let profit = timestamp_elements[timestamp_elements.length-1].profit
+        let ticker = cp.position.possibleYahooTicker
+
+        points.push([volatility, profit, ticker])
+    }
+
+    console.log(points)
+
+    let option = {
+        title: {
+            text: "Risk vs Return"
+        },
+
+        xAxis: {},
+        yAxis: {},
+        tooltip: {
+            tooltip: {}
+        },
+
+        series: [
+            {
+                type: "scatter",
+                data: points,
+                label: {
+                    show: true,
+                    formatter: (params) => params.value[2],
+                    position: "right"
+                }
+            }
+        ]
+
+    }
+
+    return option
 }
