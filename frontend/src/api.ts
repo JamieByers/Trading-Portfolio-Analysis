@@ -4,8 +4,8 @@ type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
-    let url = "/api"
-    // let url = "http://localhost:8080/api"
+    // let url = "/api"
+    let url = "http://localhost:8080/api"
 
     if (cache.get(path) != null) { return cache.get(path) }
 
@@ -13,7 +13,7 @@ export async function getData(path: string) {
     console.log("response")
     console.log(response)
     if (!response.ok) {
-        throw new Error
+        throw new Error()
     }
 
     let json = await response.json();

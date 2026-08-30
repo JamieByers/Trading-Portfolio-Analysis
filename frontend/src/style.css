@@ -109,15 +109,21 @@ body {
 
 }
 
-
 .inputElement {
     height: 100%;
+    min-width: 226px;
     border: 1px solid #000;
     border-radius: 15px;
     display: flex;
     align-items: center;
     padding-left: 2%;
 }
+
+#stockTable, th, td {
+    border: 1px solid #000;
+}
+
+
 
 @media (max-width: 768px) {
 

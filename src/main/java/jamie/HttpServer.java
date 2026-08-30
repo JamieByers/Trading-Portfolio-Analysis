@@ -15,7 +15,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.ArrayList;
 import java.util.regex.*;
 
@@ -111,7 +110,6 @@ public class HttpServer {
         System.out.println();
     }
 
-    // TODO: Fix this whole routing system to work with the server /api is messing with it
     public void route(String path, BufferedWriter writer) throws Exception {
         String cache = this.cache.getFromCache(path);
         if (cache != null) {
@@ -119,14 +117,16 @@ public class HttpServer {
             return;
         }
 
-        // /api/all?range=...&interval=...
+        // /api/all?range=...&interval=.../...
         String route = path;
         if (path.startsWith("/api")) {
             route = route.substring(4);
         }
 
-        // /all?range=...&interval=...
-        String[] split_path = route.split("\\?");
+        String[] split_route = route.split("\\/");
+
+        // [/all?range=...&interval=..., /...]
+        String[] split_path = split_route[1].split("\\?");
 
         // ["/all", "range=...&interval=..."]
         String matching_path = split_path[0];
@@ -134,12 +134,13 @@ public class HttpServer {
 
 
         // "/all"
+        System.out.println("Matching path: "+ matching_path);
         switch (matching_path) {
-            case "/coffee":
+            case "coffee":
                 writeResponse("Coffee!!!!", writer);
                 break;
 
-            case "/all":
+            case "all":
                 List<CombinedPosition> combinedPositionsAll = getCombinedPositions(params);
                 this.combined_positions = combinedPositionsAll;
                 String json = mapper.writeValueAsString(combinedPositionsAll);
@@ -148,7 +149,7 @@ public class HttpServer {
                 writeResponse(json.toString(), writer);
                 break;
 
-            case "/profit-over-time":
+            case "profit-over-time":
                 List<CombinedPosition> cps = new ArrayList<>();
                 for ( Position p : this.positions ) {
                     HashMap<String, String> params_map = new HashMap<>();
@@ -181,7 +182,7 @@ public class HttpServer {
             default:
                 Position pos = findPosition(matching_path, positions);
 
-                if (pos == null) {
+                if (pos == null || (split_route.length > 2 && split_route[1] == "exact")) {
                     YahooPosition yp = getYahooInformation(matching_path, params);
                     CombinedPosition new_cp = new CombinedPosition(null, yp);
                     String new_cp_json = new_cp.toJson();

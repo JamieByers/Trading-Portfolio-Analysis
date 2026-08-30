@@ -3,9 +3,10 @@ import * as echarts from "echarts";
 import { createCandleStickGraph } from "./charts/candleStickGraph.ts"
 import { createPieChart } from "./charts/pieChart.ts"
 import { generateVolatilityGraph, topChart } from "./charts/barChart.ts"
-import { portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
+import { generateMonteCarloGraph, portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
 import { generateRiskReturnScatterplot, generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
+
 
 let now = Date.now()
 
@@ -130,6 +131,22 @@ let riskReturnGraph = echarts.init(document.getElementById("riskReturnGraph"))
 let riskReturnGraphOption = await generateRiskReturnScatterplot();
 riskReturnGraph.setOption(riskReturnGraphOption)
 
+let monteCarloGraph = echarts.init(document.getElementById("monteCarloGraph"))
+let monteCarloGraphOption = await generateMonteCarloGraph("SNDK", 100, 100, 100);
+monteCarloGraph.setOption(monteCarloGraphOption)
+
+let monteCarloTicker = document.getElementById("monteCarloTickerInput") as HTMLInputElement;
+let monteCarloHistory = document.getElementById("monteCarloHistoryInput") as HTMLInputElement;
+let monteCarloPeriod = document.getElementById("monteCarloPeriodInput") as HTMLInputElement;
+let monteCarloNSimulations = document.getElementById("monteCarloNSimulationsInput") as HTMLInputElement;
+[monteCarloTicker, monteCarloHistory, monteCarloPeriod, monteCarloNSimulations].forEach((el: HTMLInputElement) => {
+    el.addEventListener("input", async () => {
+        let option = await generateMonteCarloGraph(monteCarloTicker.value, Number(monteCarloHistory.value), Number(monteCarloPeriod.value), Number(monteCarloNSimulations.value))
+        monteCarloGraph.setOption(option, {notMerge: true})
+    })
+});
+
+
 window.addEventListener("resize", () => {
     mainCandleStickGraph.resize()
     pieChart.resize()
@@ -143,6 +160,7 @@ window.addEventListener("resize", () => {
     portfolioOvertime.resize()
     volatilityOverTime.resize()
     riskReturnGraph.resize()
+    monteCarloGraph.resize()
 })
 
 let then = Date.now()

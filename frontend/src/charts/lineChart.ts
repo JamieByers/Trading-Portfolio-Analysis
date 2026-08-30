@@ -1,4 +1,5 @@
 import { getData, getAllData } from "../api"
+import { generateMonteCarlo } from "./monteCarlo";
 
 export async function portfolioOverTime() {
     let all_data = await getData("/all")
@@ -184,3 +185,66 @@ export async function profitOverTime() {
 }
 
 
+export async function generateMonteCarloGraph(ticker: string, history: number, period: number, n_simulations: number) {
+    ticker = ticker || "SNDK"
+    history = history || 100
+    period = period || 100
+    n_simulations = n_simulations || 100
+
+    let stock = await getData("/" + ticker + "?range=" + history + "d&interval=1d" + "/exact")
+
+    let { simulations, current_value, min, max, starting_value } = generateMonteCarlo(stock, n_simulations, period, history)
+    let lines = []
+
+    for (let simulation of simulations) {
+        lines.push({
+            type: "line",
+            data: simulation,
+            lineStyle: {
+                opacity: 0.3,
+                width: 2
+            },
+
+            showSymbol: false
+        })
+
+    }
+
+    let option = {
+        title: {
+            text: "Monte Carlo Simulation: " + stock.yahooPosition.ticker + " " + stock.yahooPosition.name
+        },
+
+        xAxis: {
+            type: "value",
+            name: "Days",
+        },
+
+        yAxis: {
+            type: "value",
+            name: "Price",
+            min: min * 0.9,
+            max: max * 1.1,
+        },
+
+        series: [
+            ...lines,
+            {
+                type: "line",
+                data: [
+                    [0, current_value],
+                    [period, current_value]
+                ],
+                lineStyle: {
+                    width: 4,
+                    color: "grey"
+                },
+            }
+        ]
+
+    }
+
+    return option
+
+
+}
