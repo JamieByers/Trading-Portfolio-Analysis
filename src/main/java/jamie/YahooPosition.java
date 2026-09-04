@@ -25,7 +25,7 @@ public class YahooPosition {
     public JSONArray close;
     public JSONArray open;
 
-    double volatility;
+    public double volatility;
 
     public List<String> timestamp;
     public List<TimestampElement> timestamp_elements;
@@ -91,10 +91,28 @@ public class YahooPosition {
 
             this.timestamp_elements.add(current_timestamp);
         }
+
+        this.volatility = calculateSD(timestamp_elements);
+
     }
 
-    public void changeToday() {
+    public double calculateSD(List<TimestampElement> timestamp_elements) {
+        double total = 0;
+        int length = timestamp_elements.size();
 
+        for (TimestampElement te : timestamp_elements) {
+            total += te.priceChangePercentage;
+        }
+
+        double mean = total / length;
+
+        double sum_of_subtracted_means = 0;
+
+        for (TimestampElement t : timestamp_elements) {
+            sum_of_subtracted_means += Math.pow((t.priceChangePercentage - mean), 2);
+        }
+
+        return Math.sqrt(sum_of_subtracted_means / (length - 1));
     }
 
     // these will be used for printing for example $30 low/high

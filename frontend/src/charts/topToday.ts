@@ -1,42 +1,19 @@
-import { getData } from "../api"
+import { getTodayElements } from "../api"
+
 
 export async function topWinnersToday() {
-    let all_data = await getData("/all")
+    let todays_elements = await getTodayElements();
 
-    let todays_elements = []
-
-    let keep_date = ""
-    for (let pos of all_data) {
-        let yp = pos.yahooPosition
-        let tels = yp.timestamp_elements
-
-        let todays_element = tels[tels.length - 1]
-        let date = todays_element.timestamp.slice(0,10)
-        keep_date = date
-        let today_pl = pos.position.currentValue - ( pos.position.currentValue / (1+(todays_element.priceChangePercentage / 100)))
-        todays_elements.push({ticker: yp.ticker, element: todays_element, pl: today_pl})
-    }
-
-    let split_date = keep_date.split("-")
-    keep_date = split_date[2] + "/" + split_date[1] + "/" + split_date[0]
-
-
-    todays_elements.sort((a,b) => b.element.priceChange - a.element.priceChange)
+    todays_elements.sort((a,b) => b.todaypl- a.todaypl)
     todays_elements = todays_elements.slice(0,5)
 
-    let names = []
-    let pls = []
-    let changesp = []
-
-    for (let el of todays_elements) {
-        names.push(el.ticker)
-        pls.push(el.pl)
-        changesp.push(el.element.priceChangePercentage)
-    }
+    let names = todays_elements.map(el => el.position.yahooPosition.ticker)
+    let pls = todays_elements.map(el => el.todaypl)
+    let changesp = todays_elements.map(el => el.tpcp)
 
     let option = {
         title: {
-            text: "Top Winners Today (" + keep_date + ")"
+            text: "Top Winners Today (Last 24hrs)"
         },
         legend: {
             data: ["Absolute", "Percentage"],
@@ -95,41 +72,18 @@ export async function topWinnersToday() {
 
 
 export async function topLosersToday() {
-    let all_data = await getData("/all")
+    let todays_elements = await getTodayElements();
 
-    let todays_elements = []
-    let keep_date = ""
-
-    for (let pos of all_data) {
-        let yp = pos.yahooPosition
-        let tels = yp.timestamp_elements
-
-        let todays_element = tels[tels.length - 1]
-        let date = todays_element.timestamp.slice(0,10)
-        keep_date = date
-        let today_pl = pos.position.currentValue - ( pos.position.currentValue / (1+(todays_element.priceChangePercentage / 100)))
-        todays_elements.push({ticker: yp.ticker, element: todays_element, pl: today_pl})
-    }
-
-    let split_date = keep_date.split("-")
-    keep_date = split_date[2] + "/" + split_date[1] + "/" + split_date[0]
-
-    todays_elements.sort((a,b) => a.element.priceChange - b.element.priceChange)
+    todays_elements.sort((a,b) => a.todaypl- b.todaypl)
     todays_elements = todays_elements.slice(0,5)
 
-    let names = []
-    let pls = []
-    let changesp = []
-
-    for (let el of todays_elements) {
-        names.push(el.ticker)
-        pls.push(el.pl)
-        changesp.push(el.element.priceChangePercentage)
-    }
+    let names = todays_elements.map(el => el.position.yahooPosition.ticker)
+    let pls = todays_elements.map(el => el.todaypl)
+    let changesp = todays_elements.map(el => el.tpcp)
 
     let option = {
         title: {
-            text: "Top Losers Today (" + keep_date + ")"
+            text: "Top Losers Today (Last 24hrs)"
         },
 
         legend: {
@@ -204,40 +158,18 @@ export async function topLosersToday() {
 
 
 export async function topMoversToday() {
-    let all_data = await getData("/all")
+    let todays_elements = await getTodayElements();
 
-    let todays_elements = []
-    let keep_date = ""
-
-    for (let pos of all_data) {
-        let yp = pos.yahooPosition
-        let tels = yp.timestamp_elements
-
-        let todays_element = tels[tels.length - 1]
-        let date = todays_element.timestamp.slice(0,10)
-        keep_date = date
-        todays_elements.push({ticker: yp.ticker, element: todays_element })
-    }
-
-    let split_date = keep_date.split("-")
-    keep_date = split_date[2] + "/" + split_date[1] + "/" + split_date[0]
-
-    todays_elements.sort((a,b) => a.element.priceChange - b.element.priceChange)
+    todays_elements.sort((a,b) => b.change - a.change)
     todays_elements = todays_elements.slice(0,5)
 
-    let names = []
-    let changes = []
-    let changesp = []
-
-    for (let el of todays_elements) {
-        names.push(el.ticker)
-        changes.push(el.element.priceChange)
-        changesp.push(el.element.priceChangePercentage)
-    }
+    let names = todays_elements.map(el => el.position.yahooPosition.ticker)
+    let changes = todays_elements.map(el => el.change)
+    let changesp = todays_elements.map(el => el.tpcp)
 
     let option = {
         title: {
-            text: "Top Movers Today (" + keep_date + ")"
+            text: "Top Movers Today (Last 24hrs)"
         },
 
         legend: {

@@ -28,7 +28,7 @@ export async function portfolioOverTime() {
 
     let option = {
         title: {
-            text: "Estimate Investments Over Time"
+            text: "Estimate Deposits Over Time"
         },
 
         yAxis: {
@@ -152,7 +152,7 @@ export async function profitOverTime() {
                 showSymbol: false,
 
                 lineStyle: {
-                    winth: 4
+                    opacity: 0.2
                 },
                 z: 10,
 

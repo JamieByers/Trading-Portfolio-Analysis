@@ -1,0 +1,7 @@
+name: Trading Pipeline
+
+on:
+  push:
+      branches:
+          - main
+

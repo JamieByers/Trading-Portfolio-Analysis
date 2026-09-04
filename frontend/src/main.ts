@@ -6,6 +6,7 @@ import { generateVolatilityGraph, topChart } from "./charts/barChart.ts"
 import { generateMonteCarloGraph, portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
 import { generateRiskReturnScatterplot, generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
+import { generateStockTable } from "./charts/table.ts";
 
 
 let now = Date.now()
@@ -146,6 +147,7 @@ let monteCarloNSimulations = document.getElementById("monteCarloNSimulationsInpu
     })
 });
 
+generateStockTable()
 
 window.addEventListener("resize", () => {
     mainCandleStickGraph.resize()

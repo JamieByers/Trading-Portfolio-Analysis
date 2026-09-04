@@ -26,6 +26,7 @@ public class Position {
     public String createdAt;
     public String holdingTime;
     public long holdingTimeValue;
+    public long holdingTimeDaysValue;
 
     public void parse(JSONObject o) {
         this.quantityAvailableForTrading = o.getFloat("quantityAvailableForTrading");
@@ -39,6 +40,7 @@ public class Position {
         Instant createdAtInstant = Instant.parse(this.createdAt);
         Duration holdingTime = Duration.between(createdAtInstant, now);
         this.holdingTimeValue = holdingTime.toSeconds();
+        this.holdingTimeDaysValue = holdingTime.toDays();
         this.holdingTime = Long.toString(holdingTime.toDays());
 
         //instrument

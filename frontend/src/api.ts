@@ -10,19 +10,95 @@ export async function getData(path: string) {
     if (cache.get(path) != null) { return cache.get(path) }
 
     const response = await fetch(url+path);
-    console.log("response")
     console.log(response)
     if (!response.ok) {
         throw new Error()
     }
 
     let json = await response.json();
-    console.log(json)
 
     cache.set(path, json)
 
     return json
 }
+
+type TodayElement = {
+    position: any,
+    todaypl: number,
+    tpcp: number,
+    change: number,
+}
+
+export async function getTodayElements() {
+    let all_data = await getData("/all?range=24h&interval=1h")
+    let todays_elements = []
+
+    for (let cp of all_data) {
+        let current_value = cp.position.currentValue;
+        let before_value = current_value;
+        let today_price_change_percentage = 0;
+        let today_price_change = 0;
+
+        for (let timestamp of cp.yahooPosition.timestamp_elements) {
+            before_value /= 1 + (timestamp.priceChangePercentage / 100)
+            today_price_change_percentage += timestamp.priceChangePercentage
+            today_price_change += timestamp.priceChange;
+        }
+
+        let todaypl = current_value - before_value;
+
+        let today: TodayElement = {
+            position: cp,
+            todaypl,
+            tpcp: today_price_change_percentage,
+            change: today_price_change
+        }
+
+
+        todays_elements.push(today);
+    }
+
+    return todays_elements;
+}
+
+// "2026-09-03T14:30+01:00[Europe/London]"
+export async function getOnlyToday() {
+    const today_date = new Date().toISOString().split("T")[0]; // 2026-09-04
+
+    let all_data = await getData("/all?range=24h&interval=1h")
+    let todays_elements = []
+
+    for (let cp of all_data) {
+        let current_value = cp.position.currentValue;
+        let before_value = current_value;
+        let today_price_change_percentage = 0;
+        let today_price_change = 0;
+
+        for (let timestamp of cp.yahooPosition.timestamp_elements) {
+            console.log(timestamp.timestamp.split("T")[0], today_date)
+            if (timestamp.timestamp.split("T")[0] != today_date) { continue }
+            before_value /= 1 + (timestamp.priceChangePercentage / 100)
+            today_price_change_percentage += timestamp.priceChangePercentage
+            today_price_change += timestamp.priceChange;
+        }
+
+        let todaypl = current_value - before_value;
+
+        let today: TodayElement = {
+            position: cp,
+            todaypl,
+            tpcp: today_price_change_percentage,
+            change: today_price_change
+        }
+
+
+        todays_elements.push(today);
+    }
+
+    return todays_elements;
+}
+
+getOnlyToday()
 
 export async function parseParams(path: string) {
     let split_path = path.split("?")
@@ -36,7 +112,6 @@ export async function parseParams(path: string) {
 
 export async function getAllData() {
     let all_data = await getData("/all")
-    console.log(all_data);
 
     let lines: types.Line[] = []
 
@@ -96,7 +171,6 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     params ??= window.location.search || "?interval=1h&range=1wk"
 
     let json = await getData("/" + ticker + params)
-    console.log(json)
     let ypos = json.yahooPosition
     let tels = ypos.timestamp_elements
 
