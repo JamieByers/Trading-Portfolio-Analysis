@@ -13,6 +13,8 @@ let now = Date.now()
 
 let current_path = window.location.pathname.split("/")
 let params = window.location.search
+
+console.log(window.location)
 console.log(current_path)
 console.log(params)
 

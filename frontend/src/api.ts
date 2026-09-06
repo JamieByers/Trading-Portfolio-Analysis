@@ -4,8 +4,12 @@ type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
-    // let url = "/api"
-    let url = "http://localhost:8080/api"
+    let url: string;
+    if (window.location.href.includes("localhost")) {
+        url = "http://localhost:8080/api"
+    } else {
+        url = "/api"
+    }
 
     if (cache.get(path) != null) { return cache.get(path) }
 
