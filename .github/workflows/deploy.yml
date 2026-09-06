@@ -5,3 +5,31 @@ on:
       branches:
           - main
 
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy
+        env:
+          SSH_PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+        run: |
+          mkdir -p ~/.ssh
+          echo "$SSH_PRIVATE_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+
+          ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@141.147.68.234 "
+            cd ~/trading &&
+            git pull &&
+            mvn clean package &&
+            cd frontend &&
+            bun install &&
+            bun run build &&
+
+            sudo systemctl restart trading &&
+            sudo systemctl status trading &&
+            sudo systemctl reload nginx
+
+          "
+
+
