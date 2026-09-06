@@ -12,6 +12,7 @@ export async function getData(path: string) {
     }
 
     if (cache.get(path) != null) { return cache.get(path) }
+    console.log("cache", cache)
 
     const response = await fetch(url+path);
     console.log(response)
@@ -20,6 +21,7 @@ export async function getData(path: string) {
     }
 
     let json = await response.json();
+    console.log(json)
 
     cache.set(path, json)
 
@@ -173,6 +175,7 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     params ??= window.location.search || "?interval=1h&range=1wk"
 
     let json = await getData("/" + ticker + params)
+    let pos = json.position
     let ypos = json.yahooPosition
     let tels = ypos.timestamp_elements
 
@@ -183,17 +186,32 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     let min = Math.min(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
     let max = Math.max(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
 
+    let cutoff = new Date()
+    cutoff.setDate(cutoff.getDate() - pos.holdingTimeDaysValue)
+
+    let cutoffDate: string = cutoff.toISOString().split("T")[0]
+
     for (let tel of tels) {
-        timestamps.push(tel.timestamp.slice(0,10))
+        let timestamp_slice = tel.timestamp.slice(0,10)
         let current_timestamp: number[] = [tel.open, tel.close, tel.low, tel.high]
         let possible_new_min = Math.min(...current_timestamp)
-        let possible_new_max = Math.min(...current_timestamp)
+        let possible_new_max = Math.max(...current_timestamp)
 
         if (possible_new_min < min) { min = possible_new_min }
         if (possible_new_max > max) { max = possible_new_max }
 
-        changes.push(tel.priceChange)
-        timestamp_data.push(current_timestamp)
+        if (params.includes("holdingTime=true") ) {
+            if (timestamp_slice >= cutoffDate) {
+                changes.push(tel.priceChange)
+                timestamp_data.push(current_timestamp)
+                timestamps.push(timestamp_slice)
+            }
+        } else {
+            changes.push(tel.priceChange)
+            timestamp_data.push(current_timestamp)
+            timestamps.push(timestamp_slice)
+        }
+
     }
 
     min = Math.floor(min)

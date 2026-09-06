@@ -181,6 +181,13 @@ public class HttpServer {
 
             default:
                 Position pos = findPosition(matching_path, positions);
+                System.out.println("params before " + params);
+                if ("holdingTime=true".equals(params.get("holdingTime"))) {
+                    params.put("range", "range=" + pos.holdingTimeDaysValue + "d");
+                    params.remove("holdingTime");
+                }
+
+                System.out.println("params after "+ params);
 
                 if (pos == null || (split_route.length > 2 && split_route[1] == "exact")) {
                     YahooPosition yp = getYahooInformation(matching_path, params);
