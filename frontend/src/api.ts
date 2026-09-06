@@ -102,8 +102,6 @@ export async function getOnlyToday() {
     return todays_elements;
 }
 
-getOnlyToday()
-
 export async function parseParams(path: string) {
     let split_path = path.split("?")
     let real_path = split_path[0]

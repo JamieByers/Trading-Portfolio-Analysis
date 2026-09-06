@@ -9,10 +9,10 @@ import { generateRiskReturnScatterplot } from "./charts/scatterPlot.ts";
 import { generateStockTable } from "./charts/table.ts";
 
 
-let now = Date.now()
+const now = Date.now()
 
-let current_path = window.location.pathname.split("/")
-let params = window.location.search
+const current_path = window.location.pathname.split("/")
+const params = window.location.search
 
 console.log(window.location)
 console.log(current_path)
@@ -21,18 +21,18 @@ console.log(params)
 let path: string;
 if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
 
-let mainCandleStickGraph = echarts.init(document.getElementById("chart"));
-
+const mainCandleStickGraph = echarts.init(document.getElementById("chart"));
 const loading = document.querySelector(".loading") as HTMLElement;
-let option = await createCandleStickGraph(path, "?range=1mo&interval=1d");
+
+const mainCandleStickOption = await createCandleStickGraph(path, "?range=1mo&interval=1d");
+
 loading.style.display = "none";
+mainCandleStickGraph.setOption(mainCandleStickOption);
 
-mainCandleStickGraph.setOption(option);
 
-
-let primaryTickerInput = document.getElementById("primaryTickerInput") as HTMLInputElement
-let primaryRangeInput = document.getElementById("primaryRangeInput") as HTMLInputElement
-let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HTMLInputElement
+const primaryTickerInput = document.getElementById("primaryTickerInput") as HTMLInputElement
+const primaryRangeInput = document.getElementById("primaryRangeInput") as HTMLInputElement
+const primaryIntervalInput = document.getElementById("primaryIntervalInput") as HTMLInputElement
 
 
 [primaryTickerInput, primaryRangeInput, primaryIntervalInput].forEach((el: HTMLInputElement) => {
@@ -44,63 +44,62 @@ let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HT
 // ------------------------------------------------------
 
 
-let pieChart = echarts.init(document.getElementById("pieChart"))
-let pie_option = await createPieChart()
-
-pieChart.setOption(pie_option)
-
-
-let topWinnersChartElement = echarts.init(document.getElementById("topChart"))
-let twc_option = await topChart()
-
-topWinnersChartElement.setOption(twc_option)
+const pieChart = echarts.init(document.getElementById("pieChart"))
+const pieChartOption = await createPieChart()
+pieChart.setOption(pieChartOption)
 
 
-let portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
-let pot = await portfolioOverTime()
-portfolioOvertime.setOption(pot)
+const topWinnersChartElement = echarts.init(document.getElementById("topChart"))
+const topWinnersChartOption = await topChart()
+
+topWinnersChartElement.setOption(topWinnersChartOption)
+
+
+const portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
+const portfolioOverTimeOption = await portfolioOverTime()
+portfolioOvertime.setOption(portfolioOverTimeOption)
 
 // ------------------------------------------------------
 
-let topWinnersTodayElement = document.getElementById("topWinnersToday")
-let topWinnersTodayChart = echarts.init(topWinnersTodayElement)
+const topWinnersTodayElement = document.getElementById("topWinnersToday")
+const topWinnersTodayChart = echarts.init(topWinnersTodayElement)
 let hours_or_days_winners = false;
 
-let tt = await topWinnersToday(hours_or_days_winners)
-topWinnersTodayChart.setOption(tt)
+let top_winners_today = await topWinnersToday(hours_or_days_winners)
+topWinnersTodayChart.setOption(top_winners_today)
 
 topWinnersTodayElement.addEventListener("click", async () => {
     hours_or_days_winners = !hours_or_days_winners
-    tt = await topWinnersToday(hours_or_days_winners)
-    topWinnersTodayChart.setOption(tt)
+    top_winners_today = await topWinnersToday(hours_or_days_winners)
+    topWinnersTodayChart.setOption(top_winners_today)
 })
 
 
-let topLosersTodayElement = document.getElementById("topLosersToday")
-let topLosersTodayChart = echarts.init(topLosersTodayElement)
+const topLosersTodayElement = document.getElementById("topLosersToday")
+const topLosersTodayChart = echarts.init(topLosersTodayElement)
 let hours_or_days_losers = false;
 
-let tl = await topLosersToday(hours_or_days_losers)
-topLosersTodayChart.setOption(tl)
+let top_losers_today = await topLosersToday(hours_or_days_losers)
+topLosersTodayChart.setOption(top_losers_today)
 
 topLosersTodayElement.addEventListener("click", async () => {
     hours_or_days_losers = !hours_or_days_losers
-    tl = await topLosersToday(hours_or_days_losers)
-    topLosersTodayChart.setOption(tl)
+    top_losers_today = await topLosersToday(hours_or_days_losers)
+    topLosersTodayChart.setOption(top_losers_today)
 })
 
 
-let topMoversTodayElement = document.getElementById("topMoversToday")
-let topMoversTodayChart = echarts.init(topMoversTodayElement)
+const topMoversTodayElement = document.getElementById("topMoversToday")
+const topMoversTodayChart = echarts.init(topMoversTodayElement)
 let hours_or_days_movers = false
 
-let tm = await topMoversToday()
-topMoversTodayChart.setOption(tm);
+let top_movers_today = await topMoversToday()
+topMoversTodayChart.setOption(top_movers_today);
 
 topMoversTodayElement.addEventListener("click", async () => {
     hours_or_days_movers = !hours_or_days_movers
-    tm = await topMoversToday(hours_or_days_movers)
-    topMoversTodayChart.setOption(tm)
+    top_movers_today = await topMoversToday(hours_or_days_movers)
+    topMoversTodayChart.setOption(top_movers_today)
 })
 
 
@@ -109,24 +108,24 @@ topMoversTodayElement.addEventListener("click", async () => {
 // ------------------------------------------------------
 
 
-let compare1 = document.getElementById("compareInput1") as HTMLInputElement
-let compare2 = document.getElementById("compareInput2") as HTMLInputElement
+const compare1 = document.getElementById("compareInput1") as HTMLInputElement
+const compare2 = document.getElementById("compareInput2") as HTMLInputElement
 
-let range1 = document.getElementById("rangeInput1") as HTMLInputElement
-let range2 = document.getElementById("rangeInput2") as HTMLInputElement
+const range1 = document.getElementById("rangeInput1") as HTMLInputElement
+const range2 = document.getElementById("rangeInput2") as HTMLInputElement
 
-let interval1 = document.getElementById("intervalInput1") as HTMLInputElement
-let interval2 = document.getElementById("intervalInput2") as HTMLInputElement
+const interval1 = document.getElementById("intervalInput1") as HTMLInputElement
+const interval2 = document.getElementById("intervalInput2") as HTMLInputElement
 
-let compareTickerValue1 = compare1.value || "SNDK"
-let compareTickerValue2 = compare2.value || "ASML"
+const compareTickerValue1 = compare1.value || "SNDK"
+const compareTickerValue2 = compare2.value || "ASML"
 
-let candleCompare1 = echarts.init(document.getElementById("compareLeft"));
-let cc1o = await createCandleStickGraph(compareTickerValue1);
+const candleCompare1 = echarts.init(document.getElementById("compareLeft"));
+const cc1o = await createCandleStickGraph(compareTickerValue1);
 candleCompare1.setOption(cc1o);
 
-let candleCompare2 = echarts.init(document.getElementById("compareRight"));
-let cc2o = await createCandleStickGraph(compareTickerValue2);
+const candleCompare2 = echarts.init(document.getElementById("compareRight"));
+const cc2o = await createCandleStickGraph(compareTickerValue2);
 candleCompare2.setOption(cc2o);
 
 async function resetCandleGraph(ticker: string, range: string, interval: string, chart: echarts.ECharts) {
@@ -134,11 +133,11 @@ async function resetCandleGraph(ticker: string, range: string, interval: string,
     range = range || "1mo"
     interval = interval || "1d"
 
-    let path: string = ticker + "?range=" + range + "&interval=" + interval
+    const path: string = ticker + "?range=" + range + "&interval=" + interval
     console.log(path)
 
-    let option = await createCandleStickGraph(path);
-    chart.setOption(option)
+    const mainCandleStickOption = await createCandleStickGraph(path);
+    chart.setOption(mainCandleStickOption)
 }
 
 [compare1, range1, interval1].forEach((el: HTMLInputElement) => {
@@ -155,36 +154,36 @@ async function resetCandleGraph(ticker: string, range: string, interval: string,
 
 // ------------------------------------------------------
 
-let profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime"))
-let profitOverTimeOption = await profitOverTime();
+const profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime"))
+const profitOverTimeOption = await profitOverTime();
 profitOverTimeGraph.setOption(profitOverTimeOption)
 
 // ------------------------------------------------------
 
-let volatilityOverTime = echarts.init(document.getElementById("volatilityOverTime"))
-let volatilityOverTimeOption = await generateVolatilityGraph();
+const volatilityOverTime = echarts.init(document.getElementById("volatilityOverTime"))
+const volatilityOverTimeOption = await generateVolatilityGraph();
 volatilityOverTime.setOption(volatilityOverTimeOption)
 
 // ------------------------------------------------------
 
-let riskReturnGraph = echarts.init(document.getElementById("riskReturnGraph"))
-let riskReturnGraphOption = await generateRiskReturnScatterplot();
+const riskReturnGraph = echarts.init(document.getElementById("riskReturnGraph"))
+const riskReturnGraphOption = await generateRiskReturnScatterplot();
 riskReturnGraph.setOption(riskReturnGraphOption)
 
 // ------------------------------------------------------
 
-let monteCarloGraph = echarts.init(document.getElementById("monteCarloGraph"))
-let monteCarloGraphOption = await generateMonteCarloGraph("SNDK", 100, 100, 100);
+const monteCarloGraph = echarts.init(document.getElementById("monteCarloGraph"))
+const monteCarloGraphOption = await generateMonteCarloGraph("SNDK", 100, 100, 100);
 monteCarloGraph.setOption(monteCarloGraphOption)
 
-let monteCarloTicker = document.getElementById("monteCarloTickerInput") as HTMLInputElement;
-let monteCarloHistory = document.getElementById("monteCarloHistoryInput") as HTMLInputElement;
-let monteCarloPeriod = document.getElementById("monteCarloPeriodInput") as HTMLInputElement;
-let monteCarloNSimulations = document.getElementById("monteCarloNSimulationsInput") as HTMLInputElement;
+const monteCarloTicker = document.getElementById("monteCarloTickerInput") as HTMLInputElement;
+const monteCarloHistory = document.getElementById("monteCarloHistoryInput") as HTMLInputElement;
+const monteCarloPeriod = document.getElementById("monteCarloPeriodInput") as HTMLInputElement;
+const monteCarloNSimulations = document.getElementById("monteCarloNSimulationsInput") as HTMLInputElement;
 [monteCarloTicker, monteCarloHistory, monteCarloPeriod, monteCarloNSimulations].forEach((el: HTMLInputElement) => {
     el.addEventListener("input", async () => {
-        let option = await generateMonteCarloGraph(monteCarloTicker.value, Number(monteCarloHistory.value), Number(monteCarloPeriod.value), Number(monteCarloNSimulations.value))
-        monteCarloGraph.setOption(option, {notMerge: true})
+        const mainCandleStickOption = await generateMonteCarloGraph(monteCarloTicker.value, Number(monteCarloHistory.value), Number(monteCarloPeriod.value), Number(monteCarloNSimulations.value))
+        monteCarloGraph.setOption(mainCandleStickOption, {notMerge: true})
     })
 });
 
@@ -204,12 +203,11 @@ window.addEventListener("resize", () => {
     topMoversTodayChart.resize()
     candleCompare1.resize()
     candleCompare2.resize()
-    portfolioOvertime.resize()
     volatilityOverTime.resize()
     riskReturnGraph.resize()
     monteCarloGraph.resize()
 })
 
-let then = Date.now()
-let elapsed = (then - now) / 1000
+const then = Date.now()
+const elapsed = (then - now) / 1000
 console.log("Time Elapsed to fetch website: " + elapsed)
