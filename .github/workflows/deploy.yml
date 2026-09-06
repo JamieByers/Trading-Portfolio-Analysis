@@ -20,6 +20,10 @@ jobs:
 
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@141.147.68.234 "
             cd ~/trading &&
+
+            git fetch origin &&
+            git reset --hard main &&
+
             git pull &&
             mvn clean package &&
             cd frontend &&
