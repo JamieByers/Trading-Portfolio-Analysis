@@ -16,3 +16,8 @@ export function calculateSD(timestamp_elements) {
 
     return Math.sqrt(sum_of_subtracted_means / (timestamp_elements.length - 1))
 }
+
+export function getDate() {
+    const today = new Date().toLocaleDateString("en-GB");
+    return today
+}

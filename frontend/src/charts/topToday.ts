@@ -1,8 +1,8 @@
-import { getTodayElements } from "../api"
+import { getOnlyToday, getTodayElements } from "../api"
+import { getDate } from "./analysis";
 
-
-export async function topWinnersToday() {
-    let todays_elements = await getTodayElements();
+export async function topWinnersToday(hours_or_days: boolean = false) {
+    let todays_elements = hours_or_days ? await getOnlyToday() : await getTodayElements();
 
     todays_elements.sort((a,b) => b.todaypl- a.todaypl)
     todays_elements = todays_elements.slice(0,5)
@@ -13,7 +13,7 @@ export async function topWinnersToday() {
 
     let option = {
         title: {
-            text: "Top Winners Today (Last 24hrs)"
+            text: `Top Winners Today (${hours_or_days ? getDate() : "Last 24hrs"})`
         },
         legend: {
             data: ["Absolute", "Percentage"],
@@ -71,8 +71,8 @@ export async function topWinnersToday() {
 }
 
 
-export async function topLosersToday() {
-    let todays_elements = await getTodayElements();
+export async function topLosersToday(hours_or_days: boolean = false) {
+    let todays_elements = hours_or_days ? await getOnlyToday() : await getTodayElements();
 
     todays_elements.sort((a,b) => a.todaypl- b.todaypl)
     todays_elements = todays_elements.slice(0,5)
@@ -83,7 +83,7 @@ export async function topLosersToday() {
 
     let option = {
         title: {
-            text: "Top Losers Today (Last 24hrs)"
+            text: `Top Losers Today (${hours_or_days ? getDate() : "Last 24hrs"})`
         },
 
         legend: {
@@ -157,8 +157,8 @@ export async function topLosersToday() {
 }
 
 
-export async function topMoversToday() {
-    let todays_elements = await getTodayElements();
+export async function topMoversToday(hours_or_days: boolean = false) {
+    let todays_elements = hours_or_days ? await getOnlyToday() : await getTodayElements();
 
     todays_elements.sort((a,b) => b.change - a.change)
     todays_elements = todays_elements.slice(0,5)
@@ -169,7 +169,7 @@ export async function topMoversToday() {
 
     let option = {
         title: {
-            text: "Top Movers Today (Last 24hrs)"
+            text: `Top Movers Today (${hours_or_days ? getDate() : "Last 24hrs"})`
         },
 
         legend: {
@@ -241,5 +241,4 @@ export async function topMoversToday() {
     return option
 
 }
-
 

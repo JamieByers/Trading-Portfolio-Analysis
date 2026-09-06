@@ -5,7 +5,7 @@ import { createPieChart } from "./charts/pieChart.ts"
 import { generateVolatilityGraph, topChart } from "./charts/barChart.ts"
 import { generateMonteCarloGraph, portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
-import { generateRiskReturnScatterplot, generateScatterPlotHoldingTimeUpl } from "./charts/scatterPlot.ts";
+import { generateRiskReturnScatterplot } from "./charts/scatterPlot.ts";
 import { generateStockTable } from "./charts/table.ts";
 
 
@@ -27,6 +27,7 @@ loading.style.display = "none";
 
 mainCandleStickGraph.setOption(option);
 
+
 let primaryTickerInput = document.getElementById("primaryTickerInput") as HTMLInputElement
 let primaryRangeInput = document.getElementById("primaryRangeInput") as HTMLInputElement
 let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HTMLInputElement
@@ -38,37 +39,72 @@ let primaryIntervalInput = document.getElementById("primaryIntervalInput") as HT
     })
 });
 
+// ------------------------------------------------------
+
+
 let pieChart = echarts.init(document.getElementById("pieChart"))
 let pie_option = await createPieChart()
 
 pieChart.setOption(pie_option)
 
 
-let topLosersChartElement = echarts.init(document.getElementById("topChart"))
-let tlc_option = await topChart()
+let topWinnersChartElement = echarts.init(document.getElementById("topChart"))
+let twc_option = await topChart()
 
-topLosersChartElement.setOption(tlc_option)
+topWinnersChartElement.setOption(twc_option)
 
 
 let portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
 let pot = await portfolioOverTime()
 portfolioOvertime.setOption(pot)
 
+// ------------------------------------------------------
 
-let topWinnersTodayChart = echarts.init(document.getElementById("topWinnersToday"))
-let tt = await topWinnersToday()
+let topWinnersTodayElement = document.getElementById("topWinnersToday")
+let topWinnersTodayChart = echarts.init(topWinnersTodayElement)
+let hours_or_days_winners = false;
 
+let tt = await topWinnersToday(hours_or_days_winners)
 topWinnersTodayChart.setOption(tt)
 
-let topLosersTodayChart = echarts.init(document.getElementById("topLosersToday"))
-let tl = await topLosersToday()
+topWinnersTodayElement.addEventListener("click", async () => {
+    hours_or_days_winners = !hours_or_days_winners
+    tt = await topWinnersToday(hours_or_days_winners)
+    topWinnersTodayChart.setOption(tt)
+})
 
+
+let topLosersTodayElement = document.getElementById("topLosersToday")
+let topLosersTodayChart = echarts.init(topLosersTodayElement)
+let hours_or_days_losers = false;
+
+let tl = await topLosersToday(hours_or_days_losers)
 topLosersTodayChart.setOption(tl)
 
-let topMoversTodayChart = echarts.init(document.getElementById("topMoversToday"))
-let tm = await topMoversToday()
+topLosersTodayElement.addEventListener("click", async () => {
+    hours_or_days_losers = !hours_or_days_losers
+    tl = await topLosersToday(hours_or_days_losers)
+    topLosersTodayChart.setOption(tl)
+})
 
-topMoversTodayChart.setOption(tm)
+
+let topMoversTodayElement = document.getElementById("topMoversToday")
+let topMoversTodayChart = echarts.init(topMoversTodayElement)
+let hours_or_days_movers = false
+
+let tm = await topMoversToday()
+topMoversTodayChart.setOption(tm);
+
+topMoversTodayElement.addEventListener("click", async () => {
+    hours_or_days_movers = !hours_or_days_movers
+    tm = await topMoversToday(hours_or_days_movers)
+    topMoversTodayChart.setOption(tm)
+})
+
+
+
+
+// ------------------------------------------------------
 
 
 let compare1 = document.getElementById("compareInput1") as HTMLInputElement
@@ -115,22 +151,25 @@ async function resetCandleGraph(ticker: string, range: string, interval: string,
     })
 });
 
-
-// let holdingTimeAndReturn = echarts.init(document.getElementById("holdingTimeAndReturn"))
-// let holdingTimeAndReturnOption = await generateScatterPlotHoldingTimeUpl();
-// holdingTimeAndReturn.setOption(holdingTimeAndReturnOption)
+// ------------------------------------------------------
 
 let profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime"))
 let profitOverTimeOption = await profitOverTime();
 profitOverTimeGraph.setOption(profitOverTimeOption)
 
+// ------------------------------------------------------
+
 let volatilityOverTime = echarts.init(document.getElementById("volatilityOverTime"))
 let volatilityOverTimeOption = await generateVolatilityGraph();
 volatilityOverTime.setOption(volatilityOverTimeOption)
 
+// ------------------------------------------------------
+
 let riskReturnGraph = echarts.init(document.getElementById("riskReturnGraph"))
 let riskReturnGraphOption = await generateRiskReturnScatterplot();
 riskReturnGraph.setOption(riskReturnGraphOption)
+
+// ------------------------------------------------------
 
 let monteCarloGraph = echarts.init(document.getElementById("monteCarloGraph"))
 let monteCarloGraphOption = await generateMonteCarloGraph("SNDK", 100, 100, 100);
@@ -147,12 +186,16 @@ let monteCarloNSimulations = document.getElementById("monteCarloNSimulationsInpu
     })
 });
 
+// ------------------------------------------------------
+
 generateStockTable()
+
+// ------------------------------------------------------
 
 window.addEventListener("resize", () => {
     mainCandleStickGraph.resize()
     pieChart.resize()
-    topLosersChartElement.resize()
+    topWinnersChartElement.resize()
     portfolioOvertime.resize()
     topWinnersTodayChart.resize()
     topLosersTodayChart.resize()
