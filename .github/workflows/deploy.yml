@@ -19,21 +19,11 @@ jobs:
           chmod 600 ~/.ssh/id_rsa
 
           ssh -o StrictHostKeyChecking=no -i ~/.ssh/id_rsa opc@141.147.68.234 "
-            cd ~/trading &&
-
-            git fetch origin &&
-            git reset --hard main &&
-
-            git pull &&
-            mvn clean package &&
-            cd frontend &&
-            bun install &&
-            bun run build &&
+            ~/deploy.sh &&
 
             sudo systemctl restart trading &&
             sudo systemctl status trading &&
-            sudo systemctl reload nginx
-
+            sudo systemctl reload nginx &&
           "
 
 
