@@ -13,6 +13,10 @@ export default defineConfig({
                         req.url = "/page.html";
                     }
 
+                    if (req.url?.startsWith("/search")) {
+                        req.url = "/search.html";
+                    }
+
                     next();
                 });
             },

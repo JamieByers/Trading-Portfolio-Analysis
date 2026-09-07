@@ -8,7 +8,12 @@ export async function createCandleStickGraph(ticker: string, params?: string) {
     const linear = linearRegression(data.map(el => el[1]))
 
     let option = {
-      title: { text: ypos.ticker + " " + ypos.name },
+      title: {
+            text: ypos.ticker + " " + ypos.name ,
+              textStyle: {
+                overflow: "break"
+              },
+      },
       legend: { type: "plain" },
       xAxis: {
         type: 'category',

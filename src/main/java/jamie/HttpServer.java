@@ -149,6 +149,11 @@ public class HttpServer {
                 writeResponse(json.toString(), writer);
                 break;
 
+            case "positions":
+                String positionsJson = mapper.writeValueAsString(this.positions);
+                writeResponse(positionsJson, writer);
+                break;
+
             case "profit-over-time":
                 List<CombinedPosition> cps = new ArrayList<>();
                 for ( Position p : this.positions ) {

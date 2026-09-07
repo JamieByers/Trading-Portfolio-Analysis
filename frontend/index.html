@@ -5,109 +5,127 @@
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="/src/styles/style.css" />
+    <link rel="stylesheet" href="/src/styles/navbar.css" />
     <title>Trading Analysis</title>
 
   </head>
   <body>
-    <section id="chartSection">
-        <div class="loading">
-                <h1>Loading...<h1>
+    <section class="navbar">
+        <div class="navItem navLeft">
+                <a href="/"><h1>Home</h1></a>
+                <a href="/search"><h1>Search</h1></a>
+                <a href="/"><h1>Dashboard</h1></a>
         </div>
-        <div id="chart" class="bigChart"></div>
-    </section>
 
-    <section id="infoBar">
-        <div id="primaryInputBar" class="inputBar">
-            <input type="text" name="" value="" id="primaryTickerInput" class="inputElement" placeholder="Stock Ticker 1: SNDK">
-            <input type="text" name="" value="" id="primaryRangeInput" class="inputElement" placeholder="Range: 1mo">
-            <input type="text" name="" value="" id="primaryIntervalInput" class="inputElement" placeholder="Interval: 1d">
-         </div>
-    </section>
-
-    <section class="extraInfo">
-        <section id="pieChartSection">
-            <div id="pieChart" class="box"></div>
-        </section>
-
-        <section>
-            <div id="topChart" class="box"></div>
-        </section>
-
-
-        <section>
-            <div id="portfolioOverTime" class="box"></div>
-        </section>
-    </section>
-
-
-    <section class="extraInfo">
-        <section id="todayBarGraphWinner">
-            <div id="topWinnersToday" class="box"></div>
-        </section>
-
-        <section id="todayBarGraphLoser">
-            <div id="topLosersToday" class="box"></div>
-        </section>
-
-        <section id="todayBarGraphMover">
-            <div id="topMoversToday" class="box"></div>
-        </section>
-    </section>
-
-
-    <section class="extraInfo">
-        <div id="compareLeft" class="box"></div>
-        <div id="compareRight" class="box"></div>
-    </section>
-
-    <section id="infoBar">
-        <div id="cbar1" class="inputBar">
-            <input type="text" name="" value="" id="compareInput1" class="inputElement" placeholder="Stock Ticker 1: SNDK">
-            <input type="text" name="" value="" id="rangeInput1" class="inputElement" placeholder="Range: 1mo">
-            <input type="text" name="" value="" id="intervalInput1" class="inputElement" placeholder="Interval: 1d">
-         </div>
-        <div id="cbar2" class="inputBar">
-            <input type="text" name="" value="" id="compareInput2" class="inputElement" placeholder="Stock Ticker 2: ASML">
-            <input type="text" name="" value="" id="rangeInput2" class="inputElement" placeholder="Range: 1mo">
-            <input type="text" name="" value="" id="intervalInput2" class="inputElement" placeholder="Interval: 1d">
+        <div class="navItem navRight">
+                <a href=""><h1>Profile</h1></a>
         </div>
+
     </section>
 
-    <section id="chartSection">
-        <div id="profitOverTime" class="bigChart"></div>
-    </section>
 
-    <section id="chartSection">
-        <div id="volatilityOverTime" class="bigChart"></div>
-    </section>
+    <section id="mainPage">
 
-    <section id="chartSection">
-        <div id="riskReturnGraph" class="bigChart"></div>
-    </section>
+        <section id="chartSection">
+            <div class="loading">
+                    <h1>Loading...<h1>
+            </div>
+            <div id="chart" class="bigChart"></div>
+        </section>
 
-    <section id="chartSection">
-        <div id="monteCarloGraph" class="bigChart"></div>
-    </section>
+        <section id="infoBar">
+            <div id="primaryInputBar" class="inputBar">
+                <input type="text" name="" value="" id="primaryTickerInput" class="inputElement" placeholder="Stock Ticker 1: SNDK">
+                <input type="text" name="" value="" id="primaryRangeInput" class="inputElement" placeholder="Range: 1mo">
+                <input type="text" name="" value="" id="primaryIntervalInput" class="inputElement" placeholder="Interval: 1d">
+             </div>
+        </section>
 
-    <section id="infoBar">
-        <div id="monteCarloInputBar" class="inputBar">
-            <input type="text" name="" value="" id="monteCarloTickerInput" class="inputElement" placeholder="Stock Ticker 1: SNDK">
-            <input type="text" name="" value="" id="monteCarloHistoryInput" class="inputElement" placeholder="Available Dataset (days only): 100">
-            <input type="text" name="" value="" id="monteCarloPeriodInput" class="inputElement" placeholder="Period Forward (days only): 100">
-            <input type="text" name="" value="" id="monteCarloNSimulationsInput" class="inputElement" placeholder="Number of Simulations: 100">
-         </div>
-    </section>
+        <section class="extraInfo">
+            <section id="pieChartSection">
+                <div id="pieChart" class="box"></div>
+            </section>
 
-    <section id="tableSection" >
-            <table id="stockTable">
-                <tr>
-                    <th>Name</th>
-                    <th>Total P/L (£)</th>
-                    <th>Today's P/L (£)</th>
-                    <th>Volatility</th>
-                    <th>Holding Time (Days)</th>
-                </tr>
-            </table>
+            <section>
+                <div id="topChart" class="box"></div>
+            </section>
+
+
+            <section>
+                <div id="portfolioOverTime" class="box"></div>
+            </section>
+        </section>
+
+
+        <section class="extraInfo">
+            <section id="todayBarGraphWinner">
+                <div id="topWinnersToday" class="box"></div>
+            </section>
+
+            <section id="todayBarGraphLoser">
+                <div id="topLosersToday" class="box"></div>
+            </section>
+
+            <section id="todayBarGraphMover">
+                <div id="topMoversToday" class="box"></div>
+            </section>
+        </section>
+
+
+        <section class="extraInfo">
+            <div id="compareLeft" class="box"></div>
+            <div id="compareRight" class="box"></div>
+        </section>
+
+        <section id="infoBar">
+            <div id="cbar1" class="inputBar">
+                <input type="text" name="" value="" id="compareInput1" class="inputElement" placeholder="Stock Ticker 1: SNDK">
+                <input type="text" name="" value="" id="rangeInput1" class="inputElement" placeholder="Range: 1mo">
+                <input type="text" name="" value="" id="intervalInput1" class="inputElement" placeholder="Interval: 1d">
+             </div>
+            <div id="cbar2" class="inputBar">
+                <input type="text" name="" value="" id="compareInput2" class="inputElement" placeholder="Stock Ticker 2: ASML">
+                <input type="text" name="" value="" id="rangeInput2" class="inputElement" placeholder="Range: 1mo">
+                <input type="text" name="" value="" id="intervalInput2" class="inputElement" placeholder="Interval: 1d">
+            </div>
+        </section>
+
+        <section id="chartSection">
+            <div id="profitOverTime" class="bigChart"></div>
+        </section>
+
+        <section id="chartSection">
+            <div id="volatilityOverTime" class="bigChart"></div>
+        </section>
+
+        <section id="chartSection">
+            <div id="riskReturnGraph" class="bigChart"></div>
+        </section>
+
+        <section id="chartSection">
+            <div id="monteCarloGraph" class="bigChart"></div>
+        </section>
+
+        <section id="infoBar">
+            <div id="monteCarloInputBar" class="inputBar">
+                <input type="text" name="" value="" id="monteCarloTickerInput" class="inputElement" placeholder="Stock Ticker 1: SNDK">
+                <input type="text" name="" value="" id="monteCarloHistoryInput" class="inputElement" placeholder="Available Dataset (days only): 100">
+                <input type="text" name="" value="" id="monteCarloPeriodInput" class="inputElement" placeholder="Period Forward (days only): 100">
+                <input type="text" name="" value="" id="monteCarloNSimulationsInput" class="inputElement" placeholder="Number of Simulations: 100">
+             </div>
+        </section>
+
+        <section id="tableSection" >
+                <table id="stockTable">
+                    <tr>
+                        <th>Name</th>
+                        <th>Total P/L (£)</th>
+                        <th>Today's P/L (£)</th>
+                        <th>Volatility</th>
+                        <th>Holding Time (Days)</th>
+                    </tr>
+                </table>
+        </section>
     </section>
 
     <script type="module" src="/src/main.ts"></script>

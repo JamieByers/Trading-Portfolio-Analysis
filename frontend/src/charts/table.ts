@@ -88,16 +88,25 @@ function createRow(stock: StockRow) {
     let pcp = Math.round(stock.priceChangePercentage * 100) / 100
 
     row.innerHTML = `
-        <td class="w-2/5">
-            ${stock.name} |
-            ${stock.ticker}
-        </td>
+            <td class="w-2/5">
+                ${stock.name} |
+                ${stock.ticker}
+            </td>
 
-        <td>${stock.totalpl}</td>
-        <td>${stock.todaypl} (${pcp}%) ${stock.todaypl > 0 ? "▲" : "▼"}</td>
-        <td>${stock.volatility}</td>
-        <td>${stock.holdingTime}</td>
+            <td>${stock.totalpl}</td>
+            <td>${stock.todaypl} (${pcp}%) ${stock.todaypl > 0 ? "▲" : "▼"}</td>
+            <td>${stock.volatility}</td>
+            <td>${stock.holdingTime}</td>
     `
+
+    let ticker = stock.ticker;
+    if (stock.ticker.includes(".")) {
+        ticker = stock.ticker.split(".")[0]
+    }
+
+    row.addEventListener("click", () => {
+        window.location.href = `/page/${ticker}`
+    })
 
     return row
 }

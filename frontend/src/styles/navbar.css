@@ -1,0 +1,32 @@
+.navbar {
+    width: 100%;
+    height: 8vh;
+    background-color: white;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+}
+
+.navLeft {
+    justify-content: left;
+
+}
+
+.navRight {
+    justify-content: right;
+
+}
+
+.navItem {
+    width: 50%;
+    height: 100%;
+
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 28px;
+
+    padding: 24px;
+}
