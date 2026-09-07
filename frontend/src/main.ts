@@ -12,14 +12,19 @@ import { generateStockTable } from "./charts/table.ts";
 const now = Date.now()
 
 const current_path = window.location.pathname.split("/")
-const params = window.location.search
 
 console.log(window.location)
 console.log(current_path)
-console.log(params)
 
 let path: string;
-if (current_path[1] != "" ) { path = current_path[1] } else { path = "SNDK" }
+if (current_path.length >= 3 &&
+    current_path[1].toLowerCase() == "ticker" &&
+    current_path[2] != "") {
+
+    path = current_path[2]
+} else {
+    path = "SNDK"
+}
 
 const mainCandleStickGraph = echarts.init(document.getElementById("chart"));
 const loading = document.querySelector(".loading") as HTMLElement;
