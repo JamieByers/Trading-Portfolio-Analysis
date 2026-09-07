@@ -11,17 +11,62 @@
   </head>
 
     <body>
-        <section id="searchBarContainer">
-            <input type="" name="" value="" placeholder="Search: " id="searchBarElement" >
-            <select>
-                <option value="">Winners</option>
-                <option value="">Losers</option>
-                <option value="">Volatility</option>
-            </select>
+        <!-- --------- Navbar --------- -->
+
+        <section id="mobileNavbar">
+
+            <div class="topMobileNav">
+                <a href="/"><h1 style="font-size: 24px;">JTrading</h1></a>
+
+                <button class="nav-toggle" aria-label="Toggle menu">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </button>
+
+            </div>
+
+            <div class="links">
+                <a href="/"><h1 class="mobileNavbarLink">Home</h1></a>
+                <a href="/search"><h1 class="mobileNavbarLink">Search</h1></a>
+                <a href="/"><h1 class="mobileNavbarLink">Dashboard</h1></a>
+                <a href=""><h1 class="mobileNavbarLink">Profile</h1></a>
+            </div>
+
 
         </section>
 
-        <section class="mainPage">
+        <section class="navbar">
+            <div class="navItem navLeft">
+                <a href="/"><h1 style="font-size: 24px;">JTrading</h1></a>
+
+                <a href="/"><h1>Home</h1></a>
+                <a href="/search"><h1>Search</h1></a>
+                <a href="/"><h1>Dashboard</h1></a>
+            </div>
+
+            <div class="navItem navRight">
+                <a href=""><h1>Profile</h1></a>
+            </div>
+        </section>
+
+
+        <script type="module" src="/src/navbar.ts"></script>
+
+        <!-- --------- Navbar --------- -->
+
+
+
+        <section class="mainPage searchPage">
+        <section id="searchBarContainer">
+            <input type="" name="" value="" placeholder="Search: " id="searchBarElement" >
+            <select id="sortBySelect">
+                <option value="" disabled selected>Sort By</option>
+                <option value="winners">Winners</option>
+                <option value="losers">Losers</option>
+            </select>
+
+        </section>
             <section id="widgets">
             </section>
         </section>

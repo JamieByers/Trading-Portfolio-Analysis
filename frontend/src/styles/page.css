@@ -2,6 +2,10 @@
     /* border: 1px solid red; */
 }
 
+#mainElement {
+    padding: 16px;
+}
+
 #mainStockInfo {
     width: 33%;
     height: 100%;
