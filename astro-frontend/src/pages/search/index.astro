@@ -1,0 +1,28 @@
+---
+    import "../../styles/search.css"
+    import Layout from "../../layouts/Layout.astro"
+---
+
+<Layout>
+
+        <section class="mainPage searchPage">
+        <section id="searchBarContainer">
+            <input type="" name="" value="" placeholder="Search: " id="searchBarElement" >
+            <select id="sortBySelect">
+                <option value="" disabled selected>Sort By</option>
+                <option value="winners">Winners</option>
+                <option value="losers">Losers</option>
+            </select>
+
+        </section>
+            <section id="widgets">
+            </section>
+        </section>
+
+    <script>
+        import "../../search.ts"
+
+    </script>
+
+</Layout>
+

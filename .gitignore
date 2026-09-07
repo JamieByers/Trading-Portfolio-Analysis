@@ -1,2 +1,9 @@
 .env
 sparefile.txt
+node_modules/
+node_modules 2/
+astro-frontend/node_modules/
+target/
+dist/
+.astro/
+.DS_Store

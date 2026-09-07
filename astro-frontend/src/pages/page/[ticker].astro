@@ -1,0 +1,25 @@
+---
+import Layout from "../../layouts/Layout.astro";
+export const prerender = false;
+const { ticker } = Astro.params;
+import "../../styles/page.css";
+---
+
+    <Layout>
+
+        <section id="mainElement" class="extraInfo">
+            <div id="mainStockInfo">
+            </div>
+
+            <div id="mainStockGraph" class="box">
+            </div>
+
+        </section>
+
+
+    <script>
+        import "../../page.ts";
+    </script>
+
+
+    </Layout>
