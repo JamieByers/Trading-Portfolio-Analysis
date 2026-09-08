@@ -5,7 +5,8 @@ let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
     let url: string;
-    if (window.location.href.includes("localhost")) {
+
+    if (import.meta.env.DEV) {
         url = "http://localhost:8080/api"
     } else {
         url = "/api"
@@ -35,8 +36,8 @@ type TodayElement = {
     change: number,
 }
 
-export async function getTodayElements() {
-    let all_data = await getData("/all?range=24h&interval=1h")
+export async function getTodayElements(url: string = "all?range=24h&interval=1h") {
+    let all_data = await getData(`/${url}`)
     let todays_elements = []
 
     for (let cp of all_data) {
@@ -68,10 +69,11 @@ export async function getTodayElements() {
 }
 
 // "2026-09-03T14:30+01:00[Europe/London]"
-export async function getOnlyToday() {
+export async function getOnlyToday(url: string = "all?range=24h&interval=1h") {
     const today_date = new Date().toISOString().split("T")[0]; // 2026-09-04
 
-    let all_data = await getData("/all?range=24h&interval=1h")
+    let all_data = await getData(`/${url}`)
+    all_data = Array.isArray(all_data) ? all_data : [all_data]
     let todays_elements = []
 
     for (let cp of all_data) {

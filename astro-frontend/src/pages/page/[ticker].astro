@@ -1,20 +1,87 @@
 ---
 import Layout from "../../layouts/Layout.astro";
+import "../../styles/page.css";
+import { getOnlyToday } from "../../api.ts";
 export const prerender = false;
 const { ticker } = Astro.params;
-import "../../styles/page.css";
+
+// const today.position = await getData("/" + ticker);
+const today = (await getOnlyToday(ticker + "?holdingTime=true&interval=1d"))[0]
+const tels = today.position.yahooPosition.timestamp_elements;
+const lastTimestamp = tels[tels.length - 1];
+
 ---
 
     <Layout>
 
         <section id="mainElement" class="extraInfo">
             <div id="mainStockInfo">
+                <div id="stockTitleInfo">
+                    <h1 id="stockTitle">{today.position.position.name}</h1>
+                    <h1 id="stockTicker">{today.position.yahooPosition.ticker}</h1>
+                    <hr>
+                </div>
+                <div id="dataRows">
+                    <div class="dataRow">
+                        <h2>Bought At: </h2>
+                        <h2>{today.position.position.createdAt.split("T")[0]}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Profit/Loss: </h2>
+                        <h2>£{today.position.position.upl}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Today Profit/Loss: </h2>
+                        <h2>£{today.todaypl}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Change Today: </h2>
+                        <h2>{today.tpcp}%</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Volatility: </h2>
+                        <h2>{today.position.yahooPosition.volatility.toFixed(2)}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>52 Week High: </h2>
+                        <h2>{today.position.yahooPosition.fiftyTwoWeekHigh}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Today Open: </h2>
+                        <h2>{lastTimestamp.open.toFixed(2)}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Today Close: </h2>
+                        <h2>{lastTimestamp.close.toFixed(2)}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Today Low: </h2>
+                        <h2>{lastTimestamp.low.toFixed(2)}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Today High: </h2>
+                        <h2>{lastTimestamp.high.toFixed(2)}</h2>
+                    </div>
+                    <div class="dataRow">
+                        <h2>Stock Currency: </h2>
+                        <h2>{today.position.position.stockCurrency}</h2>
+                    </div>
+                </div>
             </div>
 
-            <div id="mainStockGraph" class="box">
+            <div id="mainCandle" class="mainStockGraph box">
             </div>
 
         </section>
+
+
+        <!-- <section id="mainElement"> -->
+        <!--     <div id="monteCarloPageChart" class="mainStockGraph box"></div> -->
+        <!--     <div id="mainStockInfo"> -->
+        <!--         <h1 id="stockTitle">Description</h1> -->
+        <!--         <hr> -->
+        <!--     </div> -->
+        <!-- </section> -->
 
 
     <script>
