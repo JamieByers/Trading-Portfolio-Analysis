@@ -2,7 +2,7 @@
     /* border: 1px solid red; */
 }
 
-#mainElement {
+.mainElement {
     padding: 16px;
     min-height: 600px;
 
@@ -11,7 +11,7 @@
     gap: 16px;
 }
 
-#mainStockInfo {
+.mainStockInfo {
     width: 33%;
     background-color: white;
     border-radius: 20px;
@@ -61,13 +61,27 @@
     min-height: 0;
 }
 
+#monteCarloPageChart {
+    height: 600px;
+    width: 100%;
+}
+
+.extraInfo {
+    margin: 0;
+}
+
+#stockDesc {
+    max-height: 600px;
+    overflow-y: auto;
+}
+
 /* Mobile */
 @media (max-width: 768px) {
-    #mainElement {
+    .mainElement {
         flex-direction: column;
     }
 
-    #mainStockInfo {
+    .mainStockInfo {
         width: 100%;
     }
 
@@ -76,5 +90,13 @@
         height: 550px;
         flex: none;
     }
+
+    #stockDesc {
+        order: 1;
+    }
+    #monteCarloPageChart {
+        order: 2;
+    }
+
 }
 

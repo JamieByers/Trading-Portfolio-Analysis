@@ -5,8 +5,8 @@ import { getOnlyToday } from "../../api.ts";
 export const prerender = false;
 const { ticker } = Astro.params;
 
-// const today.position = await getData("/" + ticker);
 const today = (await getOnlyToday(ticker + "?holdingTime=true&interval=1d"))[0]
+const name = today.position.position.name;
 const tels = today.position.yahooPosition.timestamp_elements;
 const lastTimestamp = tels[tels.length - 1];
 
@@ -14,8 +14,8 @@ const lastTimestamp = tels[tels.length - 1];
 
     <Layout>
 
-        <section id="mainElement" class="extraInfo">
-            <div id="mainStockInfo">
+        <section id="" class="extraInfo mainElement">
+            <div class="mainStockInfo">
                 <div id="stockTitleInfo">
                     <h1 id="stockTitle">{today.position.position.name}</h1>
                     <h1 id="stockTicker">{today.position.yahooPosition.ticker}</h1>
@@ -75,17 +75,35 @@ const lastTimestamp = tels[tels.length - 1];
         </section>
 
 
-        <!-- <section id="mainElement"> -->
-        <!--     <div id="monteCarloPageChart" class="mainStockGraph box"></div> -->
-        <!--     <div id="mainStockInfo"> -->
-        <!--         <h1 id="stockTitle">Description</h1> -->
-        <!--         <hr> -->
-        <!--     </div> -->
-        <!-- </section> -->
+        <section id="descMonte" class="mainElement">
+            <div id="monteCarloPageChart" class="mainStockGraph box" data-ticker={ticker}></div>
+            <div id="stockDesc" class="mainStockInfo">
+                <h1 id="stockTitle">Description</h1>
+                <hr>
+                <br>
+                <p id="stockDescription" data-ticker={ticker} data-name={name}></p>
+            </div>
+        </section>
 
 
     <script>
-        import "../../page.ts";
+        import { resizeGraphs } from "../../page.ts";
+        import { fetchDescription } from "../../web_scraper";
+
+        const desc = document.getElementById("stockDesc")
+        const stockDescription = document.getElementById("stockDescription")
+        const ticker = stockDescription?.dataset.ticker;
+        const name = stockDescription?.dataset.name;
+
+        let description = await fetchDescription(ticker, name)
+        if (description) {
+            stockDescription.innerHTML = description
+        } else {
+            desc.style.display = "none"
+            resizeGraphs()
+        }
+
+
     </script>
 
 
