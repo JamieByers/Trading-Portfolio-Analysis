@@ -4,9 +4,15 @@ type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
 export async function getData(path: string) {
-    let url = typeof window === "undefined"
-    ? "http://localhost:8080/api"
-    : "/api"
+    let url: string;
+    if (import.meta.env.DEV) {
+        url = "http://localhost:8080/api"
+    } else {
+        url = typeof window === "undefined"
+        ? "http://localhost:8080/api"
+        : "/api"
+    }
+
 
     if (cache.get(path) != null) { return cache.get(path) }
     console.log("cache", cache)
@@ -184,10 +190,14 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     let min = Math.min(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
     let max = Math.max(tels[0].open, tels[0].close, tels[0].low, tels[0].high)
 
-    let cutoff = new Date()
-    cutoff.setDate(cutoff.getDate() - pos.holdingTimeDaysValue)
+    let cutoff: Date;
+    let cutoffDate: string;
+    if (params.includes("holdingTime=true")) {
+        cutoff = new Date()
+        cutoff.setDate(cutoff.getDate() - pos.holdingTimeDaysValue)
+        cutoffDate = cutoff.toISOString().split("T")[0]
+    }
 
-    let cutoffDate: string = cutoff.toISOString().split("T")[0]
 
     for (let tel of tels) {
         let timestamp_slice = tel.timestamp.slice(0,10)

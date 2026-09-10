@@ -130,13 +130,21 @@ body {
 #stockTable {
     width: 100%;
     overflow-x: auto;
-
 }
 
-#stockTable, th, td, tr {
-    border: 1px solid #000;
+#stockTable th,
+#stockTable td,
+#stockTable tr {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.26);
     padding: 5px;
+    font-variant-numeric: tabular-nums
 }
+
+#stockTable th {
+    text-align: left;
+    font-weight: 800;
+}
+
 
 #tableSection {
     position: relative;
@@ -160,6 +168,31 @@ table {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
 }
+
+
+.row-positive {
+    background-color: rgba(193, 242, 195, 0.7);
+    transition: background-color 0.15s ease;
+}
+
+.row-negative {
+    background-color: rgba(255, 181, 181, 0.7);
+    transition: background-color 0.15s ease;
+}
+
+.row-positive:hover {
+    background-color: rgba(193, 242, 195, 1);
+}
+
+.row-negative:hover {
+    background-color: rgba(255, 181, 181, 1);
+}
+
+.final-row {
+    border-top: 1.5px solid rgba(0,0,0,0.4);
+}
+
+
 
 
 

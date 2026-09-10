@@ -1,0 +1,40 @@
+---
+    import Layout from "../../layouts/Layout.astro";
+    import "../../styles/dashboard.css"
+---
+
+    <Layout>
+
+    <main>
+        <section class="horizontal-parent">
+            <div class="long-box"></div>
+            <div class="small-box"></div>
+        </section>
+        <section class="horizontal-parent">
+            <div class="small-box"></div>
+            <div class="small-box"></div>
+            <div class="long-box"></div>
+        </section>
+
+
+
+          <section id="tableSection">
+            <table id="stockTable">
+              <tr>
+                <th>Name</th>
+                <th>Total P/L (£)</th>
+                <th>Today's P/L (£)</th>
+                <th>Volatility</th>
+                <th>Holding Time (Days)</th>
+              </tr>
+            </table>
+          </section>
+
+        </main>
+    </Layout>
+
+    <script>
+        import { generateStockTable } from "../../charts/table.ts"
+
+        generateStockTable()
+    </script>

@@ -1,4 +1,4 @@
-import { getData, getTodayElements } from "../api"
+import { getTodayElements } from "../api"
 
 type StockRow = {
     name: string,
@@ -64,19 +64,17 @@ export async function generateStockTable() {
 
     stockRows.sort((a,b) => b.totalpl - a.totalpl)
 
-    let green = "#C1F2C3"
-    let red = "#FFB5B5"
-
     for (let stockRow of stockRows) {
         let row = createRow(stockRow)
 
-        row.style.backgroundColor = stockRow.todaypl < 0 ? red : green
+        row.classList.add(stockRow.todaypl < 0 ? "row-negative" : "row-positive")
 
         table.appendChild(row)
     }
 
     let total_row_element = createRow(total_row)
-    total_row_element.style.backgroundColor = total_row.todaypl < 0 ? red : green
+    total_row_element.classList.add(total_row.todaypl < 0 ? "row-negative" : "row-positive")
+    total_row_element.classList.add("final-row")
 
     table.appendChild(total_row_element)
 }

@@ -1,0 +1,29 @@
+main {
+    padding: 20px;
+}
+
+.long-box {
+    width: 70%;
+    height: 100%;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+}
+
+.small-box {
+    width: 30%;
+    height: 100%;
+    background-color: white;
+    border-radius: 20px;
+    position: relative;
+}
+
+.horizontal-parent {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    flex-direction: row;
+    gap: 1%;
+    margin-bottom: 20px;
+}
