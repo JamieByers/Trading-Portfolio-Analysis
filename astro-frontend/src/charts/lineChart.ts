@@ -248,3 +248,5 @@ export async function generateMonteCarloGraph(ticker: string, history: number, p
 
 
 }
+
+

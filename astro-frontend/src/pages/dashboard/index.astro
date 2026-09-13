@@ -1,19 +1,94 @@
 ---
     import Layout from "../../layouts/Layout.astro";
     import "../../styles/dashboard.css"
+    import { getData } from "../../api.ts"
+    import { calculateTodayProfit } from "../../charts/analysis.ts"
+
+    const allPositions = await getData("/profit-over-time")
+
+    let portfolioValue = 0;
+    let portfolioProfit = 0;
+    let orginalPortfolioValue = 0;
+
+    for (let cp of allPositions) {
+        portfolioValue += cp.position.currentValue;
+        portfolioProfit += cp.position.upl;
+        orginalPortfolioValue += cp.position.totalCost;
+    }
+
+    portfolioValue = Math.round(portfolioValue * 100) / 100
+    portfolioProfit = Math.round(portfolioProfit * 100) / 100
+    let indicator = portfolioProfit > 0 ? "+" : "";
+    let portfolioProfitPercentage = (portfolioValue - orginalPortfolioValue) / orginalPortfolioValue * 100;
+    portfolioProfitPercentage = Math.round(portfolioProfitPercentage * 100) / 100
+
+    let todaypl = calculateTodayProfit(allPositions)
+
+    let previousPortfolioValue = portfolioValue - todaypl;
+    let todayPercentage = (todaypl / previousPortfolioValue) * 100;
+    todayPercentage = Math.round(todayPercentage * 100) / 100;
+    todayPercentage = Math.round(todayPercentage * 100) / 100
+
+    let todayPercentageIndicator = todayPercentage > 0 ? "+" : "";
+    let todayIndicator = "+";
+    if (todaypl < 0) {
+        todayIndicator = "-"
+        todaypl *= -1
+    }
+    todaypl = Math.round(todaypl * 100) / 100
+
 ---
 
     <Layout>
 
     <main>
-        <section class="horizontal-parent">
-            <div class="long-box"></div>
-            <div class="small-box"></div>
+        <section id="graphAndPositions" class="horizontal-parent">
+            <div class="long-box">
+                <div id="profitOverTime"></div>
+            </div>
+            <div class="top-right-box">
+                <h1 class="">{allPositions.length}</h1>
+                <h2 class="">Positions</h2>
+            </div>
         </section>
-        <section class="horizontal-parent">
-            <div class="small-box"></div>
-            <div class="small-box"></div>
-            <div class="long-box"></div>
+        <section id="portfolioData" class="horizontal-parent">
+            <div class="small-box">
+                <div id="portfolioValue" class="singleDataBox">
+                    <div>
+                        <h1>Portfolio Value</h1>
+                        <hr>
+                    </div>
+                    <div>
+                        <h2>£{portfolioValue}</h2>
+                        <h3>{indicator}£{portfolioProfit}</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="small-box">
+                <div id="portfolioProfit" class="singleDataBox">
+                    <div>
+                        <h1>Total P/L</h1>
+                        <hr>
+                    </div>
+                    <div>
+                        <h2>{indicator}£{portfolioProfit}</h2>
+                        <h3>{indicator}{portfolioProfitPercentage}%</h3>
+                    </div>
+                </div>
+            </div>
+            <div class="small-box">
+                <div id="todaypl" class="singleDataBox">
+                    <div>
+                        <h1>Today P/L</h1>
+                        <hr>
+                    </div>
+                    <div>
+                        <h2>{todayIndicator}£{todaypl}</h2>
+                        <h3>{todayPercentageIndicator}{todayPercentage}%</h3>
+                    </div>
+                </div>
+
+            </div>
         </section>
 
 
@@ -35,6 +110,18 @@
 
     <script>
         import { generateStockTable } from "../../charts/table.ts"
+        import { profitOverTime } from "../../charts/lineChart.ts"
+        import * as echarts from "echarts"
+
+        const profitOverTimeGraph = echarts.init(document.getElementById("profitOverTime"))
+        const profitOverTimeOption = await profitOverTime();
+        profitOverTimeOption.dataZoom = null
+        profitOverTimeGraph.setOption(profitOverTimeOption)
+
+
+        window.addEventListener("resize", () => {
+            profitOverTimeGraph.resize()
+        })
 
         generateStockTable()
     </script>
