@@ -1,0 +1,21 @@
+---
+---
+
+<section id="tableSection">
+    <table id="stockTable">
+      <tr>
+        <th data-sort="name">Name</th>
+        <th data-sort="totalpl">Total P/L</th>
+        <th data-sort="todaypl">Today's P/L</th>
+        <th data-sort="volatility">Volatility</th>
+        <th data-sort="holdingTime">Holding Time</th>
+      </tr>
+    </table>
+</section>
+
+<script>
+    import { generateStockTable } from "../charts/table.ts"
+
+    generateStockTable()
+
+</script>

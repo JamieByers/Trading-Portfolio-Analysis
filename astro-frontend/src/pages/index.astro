@@ -1,5 +1,6 @@
 ---
 import Layout from "../layouts/Layout.astro";
+import Table from "../components/Table.astro"
 ---
 
 <Layout title="Homepage">
@@ -172,17 +173,8 @@ import Layout from "../layouts/Layout.astro";
         </div>
       </section>
 
-      <section id="tableSection">
-        <table id="stockTable">
-          <tr>
-            <th>Name</th>
-            <th>Total P/L (£)</th>
-            <th>Today's P/L (£)</th>
-            <th>Volatility</th>
-            <th>Holding Time (Days)</th>
-          </tr>
-        </table>
-      </section>
+        <Table></Table>
+
 
     </section>
 

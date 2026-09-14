@@ -22,7 +22,7 @@ export function getDate() {
     return today
 }
 
-export function dateConversion(date) {
+export function dateConversion(date: string) {
     return date.split("T")[0].split("-").reverse().join("/");
 }
 

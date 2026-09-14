@@ -3,6 +3,7 @@
     import "../../styles/dashboard.css"
     import { getData } from "../../api.ts"
     import { calculateTodayProfit } from "../../charts/analysis.ts"
+    import Table from "../../components/Table.astro"
 
     const allPositions = await getData("/profit-over-time")
 
@@ -91,25 +92,12 @@
             </div>
         </section>
 
-
-
-          <section id="tableSection">
-            <table id="stockTable">
-              <tr>
-                <th>Name</th>
-                <th>Total P/L (£)</th>
-                <th>Today's P/L (£)</th>
-                <th>Volatility</th>
-                <th>Holding Time (Days)</th>
-              </tr>
-            </table>
-          </section>
+          <Table></Table>
 
         </main>
     </Layout>
 
     <script>
-        import { generateStockTable } from "../../charts/table.ts"
         import { profitOverTime } from "../../charts/lineChart.ts"
         import * as echarts from "echarts"
 
@@ -122,6 +110,4 @@
         window.addEventListener("resize", () => {
             profitOverTimeGraph.resize()
         })
-
-        generateStockTable()
     </script>

@@ -194,10 +194,6 @@ export async function initHomepage() {
 
     // ------------------------------------------------------
 
-    generateStockTable()
-
-    // ------------------------------------------------------
-
     window.addEventListener("resize", () => {
         mainCandleStickGraph.resize()
         pieChart.resize()
