@@ -1,0 +1,25 @@
+---
+    import Layout from "../layouts/Layout.astro"
+    import "../styles/profile.css"
+---
+
+<Layout>
+
+    <main>
+        <section id="settingsSidebar" class="sidebar">
+            <a href=""><h1>Account Settings</h1></a>
+            <a href=""><h1>Account Preferences</h1></a>
+            <a href=""><h1>Trading Keys</h1></a>
+            <a href=""><h1>Help</h1></a>
+        </section>
+
+        <section id="settingsBody" class="settingsBody">
+
+            <slot />
+
+        </section>
+    </main>
+
+
+</Layout>
+

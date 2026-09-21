@@ -27,6 +27,7 @@ export function dateConversion(date: string) {
 }
 
 export function calculateTodayProfit(data) {
+    console.log("Running todaypl")
     let today = 0;
     for (let cp of data) {
         let tels = cp.yahooPosition.timestamp_elements;

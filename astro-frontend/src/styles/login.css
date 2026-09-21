@@ -1,0 +1,60 @@
+#loginMain {
+    width: 100%;
+    height: 92vh;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+}
+
+#loginBox {
+    width: 78vh;
+    height: 84vh;
+    background-color: white;
+    border-radius: 20px;
+    padding: 3%;
+}
+
+#loginBox > h1 {
+    font-size: 44pt;
+    font-weight: 550;
+}
+
+#email, #password {
+    width: 100%;
+    height: 36px;
+    border: 1px solid #000;
+    border-radius: 8px;
+}
+
+table div {
+    width: 100%;
+}
+
+.inputTitles {
+    font-weight: 550;
+}
+
+#passwordTitle {
+    width: 100%;
+    height: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.inputParent {
+    min-height: 75px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+#loginButton {
+    width: 80px;
+    height: 40px;
+    border-radius: 8px;
+    background-color: #4997D0;
+    margin-top: 4px;
+}

@@ -31,6 +31,28 @@ export async function getData(path: string) {
     return json
 }
 
+export async function postData(path, body) {
+    let url: string;
+    if (import.meta.env.DEV) {
+        url = "http://localhost:8080/api"
+    } else {
+        url = typeof window === "undefined"
+        ? "http://localhost:8080/api"
+        : "/api"
+    }
+
+    const response = await fetch(url+path, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify(body)
+    })
+
+    return response
+
+}
+
 type TodayElement = {
     position: any,
     todaypl: number,

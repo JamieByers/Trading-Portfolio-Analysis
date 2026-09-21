@@ -1,0 +1,56 @@
+---
+    import Layout from "../../layouts/Layout.astro";
+    import "../../styles/login.css"
+---
+
+
+<Layout>
+
+    <main id="loginMain">
+
+        <section id="loginBox">
+            <h1>Log in</h1>
+            <h2>Need an account? <a href="/register">Create an account here</a></h2>
+            <br>
+
+            <form id="registerForm">
+                <div class="inputParent">
+                    <h2 class="inputTitles">Email</h2>
+                    <input type="text" id="email" name="email" >
+                </div>
+
+                <div class="inputParent">
+                    <div id="passwordTitle">
+                        <h2 class="inputTitles">Password</h2>
+                        <h2 class="inputTitles">Show</h2>
+                    </div>
+                    <input type="password" id="password" name="password">
+                </div>
+
+                <div class="inputParent">
+                    <div id="passwordTitle">
+                        <h2 class="inputTitles">Confirm Password</h2>
+                        <h2 class="inputTitles">Show</h2>
+                    </div>
+                    <input type="password" id="password" name="confirmPassword">
+                </div>
+
+                <div>
+                    <button id="loginButton" type="submit">Submit</button>
+                </div>
+
+            </form>
+
+
+        </section>
+
+    </main>
+
+    <script>
+        import "../../register.ts"
+    </script>
+
+</Layout>
+
+
+

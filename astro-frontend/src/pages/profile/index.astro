@@ -1,0 +1,39 @@
+---
+    import Settings from "../../components/Settings.astro"
+---
+
+<Settings>
+
+    <h1>Account Settings</h1>
+
+    <form action="">
+        <div class="settingsRow">
+            <h2>Name </h2>
+            <input type="text" name="name" id="name" class="settingsInput">
+            <div class="note">This name will only be used for personality and one does not need to be provided.</div>
+        </div>
+
+        <div class="settingsRow">
+            <h2>Email </h2>
+            <input type="text" name="email" id="email" class="settingsInput">
+            <div class="note">This will be the email used to recover your account and log in.</div>
+        </div>
+
+        <div class="settingsRow">
+            <h2>Password </h2>
+            <input type="password" name="password" id="password" class="settingsInput">
+            <div class="note"></div>
+        </div>
+
+        <button>Update Profile</button>
+    </form>
+
+    <h1 id="deleteAccount">Delete Account</h1>
+
+    <form action="">
+        <h2>Once you delete your account you can easily create a new one, but no settings will remain.</h2>
+        <button id="deleteButton">Delete Profile</button>
+
+    </form>
+
+</Settings>
