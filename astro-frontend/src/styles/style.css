@@ -46,13 +46,16 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+    flex-direction: column;
 
     z-index: 10;
-    pointer-events: none;}
+    pointer-events: none;
+    opacity: 0.5;
+
+}
 
 .loading > h1 {
     font-size: 4vw;
-    opacity: 0.5;
 }
 
 .extraInfo {
