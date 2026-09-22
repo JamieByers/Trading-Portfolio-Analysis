@@ -4,7 +4,7 @@
 
 <Settings>
 
-    <h1>Account Settings</h1>
+    <h1 id="accountSettings">Account Settings</h1>
 
     <form action="">
         <div class="settingsRow">
@@ -33,7 +33,53 @@
     <form action="">
         <h2>Once you delete your account you can easily create a new one, but no settings will remain.</h2>
         <button id="deleteButton">Delete Profile</button>
-
     </form>
+
+    <h1 id="accountPreferences">Account Preferences</h1>
+
+    <form class="checkboxRows" action="">
+        <div class="checkboxRow">
+            <div class="checkboxToggle">
+                <input type="checkbox"><h2>Turn on privacy mode</h2>
+            </div>
+            <div class="note">This will hide any absolute data about your personal portfolio like portfolio value, total P/L and today P/L, it will however still show graph analysis. </div>
+        </div>
+
+        <div class="checkboxRow">
+            <div class="checkboxToggle">
+                <input type="checkbox"><h2>Turn on larp mode</h2>
+            </div>
+            <div class="note">This will lie about any of your data from your personal portfolio like portfolio value, total P/L and today P/L. </div>
+        </div>
+    </form>
+
+    <h1 id="tradingKeys">Trading Keys</h1>
+
+    <form action="" class="keyRows">
+        <div class="keyInputs">
+            <div class="settingsRow">
+                <h2>Public Key </h2>
+                <input type="text" name="publicKey" id="publicKey" class="settingsInput">
+            </div>
+
+            <div class="settingsRow">
+                <h2>Private Key </h2>
+                <input type="text" name="privateKey" id="privateKey" class="settingsInput">
+            </div>
+        </div>
+
+
+        <div class="note">These keys will be fully encrypted and unable to access, making them secure and safe. These are used to get your personal data from your Trading 212 portfolio. Add at your own risk. </div>
+
+        <button>Update Keys</button>
+    </form>
+
+
+    <!-- <!-1- Rounded switch -1-> -->
+    <!-- <label class="switch"> -->
+    <!--   <input type="checkbox"> -->
+    <!--   <span class="slider round"></span> -->
+    <!-- </label> -->
+
 
 </Settings>

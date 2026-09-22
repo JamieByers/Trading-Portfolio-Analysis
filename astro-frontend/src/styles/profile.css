@@ -1,16 +1,22 @@
+html {
+    scroll-behavior: smooth;
+}
 
 main {
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
 
     display: flex;
     flex-direction: row;
-    align-items: center;
+    align-items: stretch;
 
 }
 
+form {
+    margin-bottom: 40px;
+}
+
 .sidebar {
-    height: 100%;
     min-width: 300px;
     background-color: white;
     padding: 30px;
@@ -139,7 +145,6 @@ button {
 
 #deleteAccount {
     color: #8f1311;
-    margin-top: 20px;
 }
 
 #deleteButton {
@@ -148,8 +153,74 @@ button {
 
 }
 
+.cog {
+    position: fixed;
+    right: 0;
+    bottom: 0;
 
-* {
-    /* border: 1px solid red; */
+    width: 50px;
+    height: 50px;
+    font-size: 40px;
+    background-color: white;
+    border-radius: 50px;
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    margin-right: 40px;
+    margin-bottom: 40px;
 }
 
+.checkboxRows {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.checkboxRow {
+    display: flex;
+    flex-direction: column;
+    width: fit-content;
+    height: fit-content;
+}
+
+.checkboxToggle {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    gap: 10px;
+
+}
+
+.checkboxRow > input {
+    width: 13px;
+    height: 13px;
+
+}
+
+.keyInputs {
+    display: flex;
+    flex-direction: row;
+}
+
+
+@media (max-width: 768px) {
+    .sidebar {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+        z-index: 1;
+    }
+    .settingsBody {
+        width: 100vw;
+        height: 100vh;
+        position: absolute;
+    }
+    .cog {
+        display: flex;
+        z-index: 100;
+
+    }
+
+}
