@@ -3,33 +3,36 @@ import * as types from "./types"
 type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
-export async function getData(path: string) {
+export async function getData(path: string, cookieHeader?: string) {
     let url: string;
+
     if (import.meta.env.DEV) {
         url = "http://localhost:8080/api"
     } else {
         url = typeof window === "undefined"
-        ? "http://localhost:8080/api"
-        : "/api"
+            ? "http://localhost:8080/api"
+            : "/api"
     }
-
 
     if (cache.get(path) != null) { return cache.get(path) }
-    console.log("cache", cache)
 
-    const response = await fetch(url+path);
-    console.log(response)
-    if (!response.ok) {
-        throw new Error()
+    const headers: Record<string, string> = {}
+    if (typeof window === "undefined" && cookieHeader) {
+        headers["Cookie"] = cookieHeader
     }
 
-    let json = await response.json();
-    console.log(json)
+    const response = await fetch(url + path, {
+        credentials: "include",
+        headers
+    })
 
-    cache.set(path, json)
+    if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+    }
 
-    return json
+    return response.json()
 }
+
 
 export async function postData(path, body) {
     let url: string;
@@ -41,13 +44,14 @@ export async function postData(path, body) {
         : "/api"
     }
 
-    const response = await fetch(url+path, {
+    const response = await fetch("http://localhost:8080/api" + path, {
         method: "POST",
+        credentials: "include",
         headers: {
             "Content-Type": "application/json"
         },
         body: JSON.stringify(body)
-    })
+    });
 
     return response
 
@@ -62,6 +66,7 @@ type TodayElement = {
 
 export async function getTodayElements(url: string = "all?range=24h&interval=1h") {
     let all_data = await getData(`/${url}`)
+    console.log("ALL DATA FROM TODAY ELEMENTS: ", all_data)
     let todays_elements = []
 
     for (let cp of all_data) {

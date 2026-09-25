@@ -5,17 +5,17 @@ export async function topChart() {
     let all_data = await getData("/all")
 
     let personal_positons = []
-    for ( let pos of all_data ) {
+    for (let pos of all_data) {
         let p = pos.position;
         personal_positons.push(p)
     }
 
-    personal_positons.sort((a,b) => b.upl - a.upl)
+    personal_positons.sort((a, b) => b.upl - a.upl)
 
     let axis_labels = []
     let data = []
 
-    for ( let i = 0; i < 5; i++) {
+    for (let i = 0; i < 5; i++) {
         axis_labels.push(personal_positons[i].name)
         data.push(personal_positons[i].upl)
     }
@@ -55,12 +55,12 @@ export async function generateVolatilityGraph() {
         let n = timestamp_elements.length
 
         let sd365 = calculateSD(timestamp_elements)
-        let sd90 = calculateSD(timestamp_elements.slice(n-90, n))
-        let sd30 = calculateSD(timestamp_elements.slice(n-30, n))
-        let sd7 = calculateSD(timestamp_elements.slice(n-7, n))
+        let sd90 = calculateSD(timestamp_elements.slice(n - 90, n))
+        let sd30 = calculateSD(timestamp_elements.slice(n - 30, n))
+        let sd7 = calculateSD(timestamp_elements.slice(n - 7, n))
 
         data.push({
-            "ticker":cp.position.possibleYahooTicker,
+            "ticker": cp.position.possibleYahooTicker,
             "sd365": sd365,
             "sd90": sd90,
             "sd30": sd30,

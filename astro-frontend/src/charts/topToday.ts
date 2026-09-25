@@ -3,6 +3,7 @@ import { getDate } from "./analysis";
 
 export async function topWinnersToday(hours_or_days: boolean = false) {
     let todays_elements = hours_or_days ? await getOnlyToday() : await getTodayElements();
+    console.log("TOP WINNERS TODAY", todays_elements)
 
     todays_elements.sort((a,b) => b.todaypl- a.todaypl)
     todays_elements = todays_elements.slice(0,5)

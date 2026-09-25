@@ -1,8 +1,18 @@
 ---
 import "../styles/style.css";
 import "../styles/navbar.css";
+import { postData } from "../api.ts";
 
 const { title = "Trading Portfolio" } = Astro.props;
+
+const session = Astro.cookies.get("session_id");
+
+let loginState = "Logout"
+
+if (!session) {
+    loginState = "Log in"
+}
+
 ---
 
 <!doctype html>
@@ -15,11 +25,8 @@ const { title = "Trading Portfolio" } = Astro.props;
 </head>
 
 <body>
-
     <nav>
-
         <section id="mobileNavbar">
-
             <div class="topMobileNav">
                 <a href="/">
                     <h1 style="font-size: 24px;">JTrading</h1>
@@ -45,9 +52,10 @@ const { title = "Trading Portfolio" } = Astro.props;
                     <h1 class="mobileNavbarLink">Dashboard</h1>
                 </a>
 
-                <a href="">
+                <a href="/profile">
                     <h1 class="mobileNavbarLink">Profile</h1>
                 </a>
+
             </div>
 
         </section>
@@ -72,13 +80,21 @@ const { title = "Trading Portfolio" } = Astro.props;
                     <h1>Dashboard</h1>
                 </a>
 
+
             </div>
 
             <div class="navItem navRight">
-                <a href="/login">
-                    <h1>Log in</h1>
-                </a>
-                <a href="">
+                {
+                    loginState == "Logout" ? (
+                        <h1 id="logoutButton">Log out</h1>
+                    ) : (
+                        <a href="/login">
+                            <h1>Log in</h1>
+                        </a>
+                    )
+                }
+
+                <a href="/profile">
                     <h1>Profile</h1>
                 </a>
             </div>

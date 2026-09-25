@@ -54,10 +54,11 @@ export async function initHomepage() {
     pieChart.setOption(pieChartOption)
 
 
-    const topWinnersChartElement = echarts.init(document.getElementById("topChart"))
+    const topWinnersChartElement = document.getElementById("topChart");
+    const topWinnersChart = echarts.init(topWinnersChartElement);
     const topWinnersChartOption = await topChart()
 
-    topWinnersChartElement.setOption(topWinnersChartOption)
+    topWinnersChart.setOption(topWinnersChartOption)
 
 
     const portfolioOvertime = echarts.init(document.getElementById("portfolioOverTime"))
