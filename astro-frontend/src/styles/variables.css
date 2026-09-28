@@ -1,3 +1,34 @@
 :root {
+    --background-color: #EFEFEF;
+    --primary: white;
+    --secondary: #FAFAFA;
+    --accent: #4997D0;
 
+    --red: #8f1311;
+    --green: #238636;
+
+    --text: black;
+
+    --positive-background: rgba(193, 242, 195, 0.7);
+    --positive-background-hover: rgba(193, 242, 195, 1);
+
+    --negative-background: rgba(255, 181, 181, 0.7);
+    --negative-background-hover: rgba(255, 181, 181, 1);
+
+    --link-color: darkblue;
+
+}
+
+[data-theme="dark"] {
+    --background-color: #464646;
+    --primary: #343434;
+    --secondary: #575757;
+
+    --text: white;
+
+    --positive-background: rgba(50, 120, 60, 0.35);
+    --positive-background-hover: rgba(50, 120, 60, 0.5);
+
+    --negative-background: rgba(150, 50, 50, 0.35);
+    --negative-background-hover: rgba(150, 50, 50, 0.5);
 }

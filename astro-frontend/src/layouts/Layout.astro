@@ -1,6 +1,7 @@
 ---
 import "../styles/style.css";
 import "../styles/navbar.css";
+import "../styles/variables.css"
 
 const { title = "Trading Portfolio" } = Astro.props;
 
@@ -67,7 +68,9 @@ if (!session) {
 
                 {
                     loginState == "Logout" ? (
-                        <h1 id="mobileLogoutButton" class="mobileNavbarLink">Log out</h1>
+                        <a href="/login">
+                            <h1 id="mobileLogoutButton" class="mobileNavbarLink">Log out</h1>
+                        </a>
                     ) : (
                         <a href="/login">
                             <h1 class="mobileNavbarLink">Log in</h1>
@@ -107,7 +110,9 @@ if (!session) {
             <div class="navItem navRight">
                 {
                     loginState == "Logout" ? (
-                        <h1 id="logoutButton">Log out</h1>
+                        <a href="/login">
+                            <h1 id="logoutButton">Log out</h1>
+                        </a>
                     ) : (
                         <a href="/login">
                             <h1>Log in</h1>
@@ -132,13 +137,17 @@ if (!session) {
         <slot />
     </main>
 
-    <script>
+    <script >
         import { initNavbar } from "../navbar";
         import { initPrivacy, handlePrivacyMode } from "../privacy.ts";
+        import { initDarkMode } from "../darkMode.ts";
 
         await initNavbar();
         await initPrivacy()
         handlePrivacyMode()
+
+        await initDarkMode()
+
 
     </script>
 

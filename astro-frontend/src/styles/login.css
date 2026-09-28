@@ -1,5 +1,9 @@
+body {
+    background-color: var(--primary);
+}
+
 a.createAccountLink {
-    color: darkblue !important;
+    color: var(--link-color) !important;
     text-decoration: underline !important;
 }
 
@@ -16,7 +20,7 @@ a.createAccountLink {
 #loginBox {
     width: 78vh;
     height: 84vh;
-    background-color: white;
+    background-color: var(--primary);
     border-radius: 20px;
     padding: 3%;
 }
@@ -61,11 +65,11 @@ table div {
     width: 80px;
     height: 40px;
     border-radius: 8px;
-    background-color: #4997D0;
+    background-color: var(--accent);
     margin-top: 4px;
 }
 
 #errorMessage {
-    color: #8f1311;
+    color: var(--red)
 
 }

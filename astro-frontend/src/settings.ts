@@ -65,26 +65,6 @@ privacyModeCheckboxElement.addEventListener("change", async () => {
 
 
 
-const darkModeCheckboxElement = document.getElementById("darkModeCheckbox") as HTMLInputElement
-console.log(darkModeCheckboxElement)
-const darkModeToggled = userSettings.dark_mode;
-if (darkModeToggled == "true") {
-    darkModeCheckboxElement.checked = true;
-} else {
-    darkModeCheckboxElement.checked = false;
-}
-
-darkModeCheckboxElement.addEventListener("change", async () => {
-    const checkboxResponse = await postData("/toggleDarkMode", {})
-    console.log(checkboxResponse);
-})
-
-
-
-
-
-
-
 
 const deleteForm = document.getElementById("deleteAccountForm")
 

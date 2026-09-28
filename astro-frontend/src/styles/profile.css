@@ -18,7 +18,7 @@ form {
 
 .sidebar {
     min-width: 300px;
-    background-color: white;
+    background-color: var(--primary);
     padding: 30px;
     border-right: 1px solid #EFEFEF;
 
@@ -36,7 +36,7 @@ form {
 .settingsBody {
     width: 1200px;
     height: 100%;
-    background-color: #fafafa;
+    background-color: var(--secondary);
     padding: 30px;
 
     display: flex;
@@ -86,7 +86,7 @@ form {
     border: 1px solid #000;
 
     border: 1px solid #3d444d;
-    background-color: white;
+    background-color: var(--primary);
     background-position: right 8px center;
     background-repeat: no-repeat;
     border-radius: 6px;
@@ -112,7 +112,7 @@ form {
 }
 
 button {
-    background-color: #238636;
+    background-color: var(--green);
     /* height: 32px; */
     /* width: 120px; */
     height: 2rem;
@@ -144,11 +144,11 @@ button {
 }
 
 #deleteAccount {
-    color: #8f1311;
+    color: var(--red)
 }
 
 #deleteButton {
-    background-color: #8f1311;
+    background-color: var(--red);
     margin-top: 8px;
 
 }
@@ -161,7 +161,7 @@ button {
     width: 50px;
     height: 50px;
     font-size: 40px;
-    background-color: white;
+    background-color: var(--primary);
     border-radius: 50px;
 
     display: none;

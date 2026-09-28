@@ -42,7 +42,7 @@
 }
 
 .searchPage {
-    background-color: white;
+    background-color: var(--primary);
     border-radius: 20px;
 }
 
@@ -71,7 +71,7 @@
     border: 1px solid #e5e5e5;
     border-radius: 20px;
 
-    background-color: white;
+    background-color: var(--primary);
     color: #171717;
 
     font-size: 14px;

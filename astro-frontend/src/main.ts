@@ -6,7 +6,6 @@ import { generateVolatilityGraph, topChart } from "./charts/barChart.ts"
 import { generateMonteCarloGraph, portfolioOverTime, profitOverTime } from "./charts/lineChart.ts"
 import { topLosersToday, topMoversToday, topWinnersToday } from "./charts/topToday.ts"
 import { generateRiskReturnScatterplot } from "./charts/scatterPlot.ts";
-import { generateStockTable } from "./charts/table.ts";
 
 export async function initHomepage() {
     const now = Date.now()
@@ -195,23 +194,100 @@ export async function initHomepage() {
 
     // ------------------------------------------------------
 
+    let charts = [
+        mainCandleStickGraph,
+        pieChart,
+        topWinnersChart,
+        portfolioOvertime,
+        topWinnersTodayChart,
+        topLosersTodayChart,
+        topMoversTodayChart,
+        candleCompare1,
+        candleCompare2,
+        volatilityOverTime,
+        riskReturnGraph,
+        monteCarloGraph,
+    ]
+
     window.addEventListener("resize", () => {
-        mainCandleStickGraph.resize()
-        pieChart.resize()
-        topWinnersChart.resize()
-        portfolioOvertime.resize()
-        topWinnersTodayChart.resize()
-        topLosersTodayChart.resize()
-        topMoversTodayChart.resize()
-        candleCompare1.resize()
-        candleCompare2.resize()
-        volatilityOverTime.resize()
-        riskReturnGraph.resize()
-        monteCarloGraph.resize()
+        charts.forEach(chart => {
+            chart.resize();
+        })
     })
 
     const then = Date.now()
     const elapsed = (then - now) / 1000
     console.log("Time Elapsed to fetch website: " + elapsed)
+
+    function updateChartTheme(charts) {
+        const styles = getComputedStyle(document.documentElement);
+
+        const text = styles.getPropertyValue("--text").trim();
+
+        for (const chart of charts) {
+            chart.setOption({
+                textStyle: {
+                    color: text
+                },
+
+                label: {
+                    color: text,
+                    borderColor: text
+                },
+
+                title: {
+                    textStyle: {
+                        color: text
+                    }
+                },
+
+                legend: {
+                    textStyle: {
+                        color: text
+                    }
+                },
+
+                tooltip: {},
+
+                xAxis: {
+                    axisLabel: {
+                        color: text
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: text
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: text
+                        }
+                    }
+                },
+
+                yAxis: {
+                    axisLabel: {
+                        color: text
+                    },
+                    axisLine: {
+                        lineStyle: {
+                            color: text
+                        }
+                    },
+                    splitLine: {
+                        lineStyle: {
+                            color: text
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    updateChartTheme(charts);
+
+    window.addEventListener("themechange", () => {
+        updateChartTheme(charts);
+    });
 
 }

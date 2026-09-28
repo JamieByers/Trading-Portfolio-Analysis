@@ -13,7 +13,7 @@
 
 .mainStockInfo {
     width: 33%;
-    background-color: white;
+    background-color: var(--primary);
     border-radius: 20px;
     position: relative;
     padding: 20px;
