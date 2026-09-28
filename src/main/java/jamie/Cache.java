@@ -2,6 +2,8 @@ package jamie;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.time.*;
+import java.util.ArrayList;
+import java.util.List;
 
 record CacheElement<T>(T data, Instant time) {};
 

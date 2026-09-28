@@ -4,6 +4,8 @@ import { calculateSD } from "./analysis";
 export async function topChart() {
     let all_data = await getData("/all")
 
+    console.log("ALL DATA FROM TOP CHART", all_data)
+
     let personal_positons = []
     for (let pos of all_data) {
         let p = pos.position;

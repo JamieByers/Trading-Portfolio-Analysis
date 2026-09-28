@@ -1,4 +1,4 @@
-import { getData, postData } from "./api";
+import { getData, postData, getUserDetails } from "./api";
 
 const cog = document.getElementById("cog");
 
@@ -16,15 +16,11 @@ cog.addEventListener("click", () => {
 const accountSettingsForm = document.getElementById("accountSettingsForm") as HTMLFormElement
 const email = document.getElementById("email") as HTMLInputElement
 
-async function getUserDetails() {
-    const userDetails = await getData("/accountSettingsDetails");
 
-    email.value = userDetails[1]
+const userDetails = await getUserDetails();
+const userSettings = await getData("/accountSettingsDetails");
+email.value = userDetails.email;
 
-    return userDetails
-}
-
-getUserDetails();
 
 accountSettingsForm.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -54,6 +50,51 @@ keyRowsForm.addEventListener("submit", async (event) => {
 })
 
 
+const privacyModeCheckboxElement = document.getElementById("privacyModeCheckbox") as HTMLInputElement
+const privacyModeToggled = userSettings.privacy_mode;
+if (privacyModeToggled == "true") {
+    privacyModeCheckboxElement.checked = true;
+} else {
+    privacyModeCheckboxElement.checked = false;
+}
+
+privacyModeCheckboxElement.addEventListener("change", async () => {
+    const checkboxResponse = await postData("/togglePrivacyMode", {})
+    console.log(checkboxResponse);
+})
+
+const larpModeCheckboxElement = document.getElementById("larpModeCheckbox") as HTMLInputElement
+const larpModeToggled = userSettings.privacy_mode;
+if (larpModeToggled == "true") {
+    larpModeCheckboxElement.checked = true;
+} else {
+    larpModeCheckboxElement.checked = false;
+}
+
+larpModeCheckboxElement.addEventListener("change", async () => {
+    const checkboxLarpResponse = await postData("/toggleLarpMode", {})
+    console.log(checkboxLarpResponse);
+})
 
 
+const deleteForm = document.getElementById("deleteAccountForm")
+
+deleteForm.addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const confirmed = confirm(
+        "Are you sure you want to delete your account? \nThis action cannot be undone and your account will be permanently deleted."
+    )
+
+    if (!confirmed) {
+        return;
+    }
+
+    const response = await postData("/deleteUser", {})
+
+    if (response.status == 200) {
+        window.location.href = "/login"
+    }
+
+})
 

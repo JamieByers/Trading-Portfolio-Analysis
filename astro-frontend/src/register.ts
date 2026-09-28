@@ -17,6 +17,9 @@ registerForm.addEventListener("submit", async (event) => {
         console.log(response)
         console.log(await response.text())
 
+        if (response.status == 200) {
+            window.location.href = "/"
+        }
     }
 
 });

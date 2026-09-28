@@ -198,7 +198,7 @@ export async function initHomepage() {
     window.addEventListener("resize", () => {
         mainCandleStickGraph.resize()
         pieChart.resize()
-        topWinnersChartElement.resize()
+        topWinnersChart.resize()
         portfolioOvertime.resize()
         topWinnersTodayChart.resize()
         topLosersTodayChart.resize()

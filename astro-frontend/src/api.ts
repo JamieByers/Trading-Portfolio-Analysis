@@ -3,7 +3,7 @@ import * as types from "./types"
 type Cache = Map<string, string>
 let cache: Cache = new Map<string, string>()
 
-export async function getData(path: string, cookieHeader?: string) {
+export async function getData(path: string) {
     let url: string;
 
     if (import.meta.env.DEV) {
@@ -14,20 +14,15 @@ export async function getData(path: string, cookieHeader?: string) {
             : "/api"
     }
 
-    if (cache.get(path) != null) { return cache.get(path) }
-
-    const headers: Record<string, string> = {}
-    if (typeof window === "undefined" && cookieHeader) {
-        headers["Cookie"] = cookieHeader
-    }
+    if (cache.get(path) != null && cache.get(path) != "") { return cache.get(path) }
 
     const response = await fetch(url + path, {
         credentials: "include",
-        headers
     })
 
     if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`)
+        const error = await response.text();
+        throw new Error(`HTTP ${response.status}: ${response.statusText} || ${error}`)
     }
 
     return response.json()
@@ -40,8 +35,8 @@ export async function postData(path, body) {
         url = "http://localhost:8080/api"
     } else {
         url = typeof window === "undefined"
-        ? "http://localhost:8080/api"
-        : "/api"
+            ? "http://localhost:8080/api"
+            : "/api"
     }
 
     const response = await fetch("http://localhost:8080/api" + path, {
@@ -52,6 +47,12 @@ export async function postData(path, body) {
         },
         body: JSON.stringify(body)
     });
+
+
+    if (!response.ok) {
+        const error = await response.text();
+        throw new Error(`HTTP ${response.status}: ${response.statusText} || ${error}`)
+    }
 
     return response
 
@@ -172,7 +173,7 @@ export async function getTicker(ticker: string) {
 
 export async function parse(data) {
     let timestamps = []
-    let closes  = []
+    let closes = []
     let changes = []
 
     for (let tel of data) {
@@ -227,7 +228,7 @@ export async function getDetailedTicker(ticker: string, params?: string) {
 
 
     for (let tel of tels) {
-        let timestamp_slice = tel.timestamp.slice(0,10)
+        let timestamp_slice = tel.timestamp.slice(0, 10)
         let current_timestamp: number[] = [tel.open, tel.close, tel.low, tel.high]
         let possible_new_min = Math.min(...current_timestamp)
         let possible_new_max = Math.max(...current_timestamp)
@@ -235,7 +236,7 @@ export async function getDetailedTicker(ticker: string, params?: string) {
         if (possible_new_min < min) { min = possible_new_min }
         if (possible_new_max > max) { max = possible_new_max }
 
-        if (params.includes("holdingTime=true") ) {
+        if (params.includes("holdingTime=true")) {
             if (timestamp_slice >= cutoffDate) {
                 changes.push(tel.priceChange)
                 timestamp_data.push(current_timestamp)
@@ -250,10 +251,10 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     }
 
     min = Math.floor(min)
-    min -= min*0.15
+    min -= min * 0.15
 
     max = Math.ceil(max)
-    max += max*0.15
+    max += max * 0.15
 
     let csg: types.CandleStickGraph = {
         timestamps: timestamps,
@@ -265,4 +266,9 @@ export async function getDetailedTicker(ticker: string, params?: string) {
     }
 
     return csg
+}
+
+export async function getUserDetails() {
+    const userDetails = await getData("/userDetails");
+    return userDetails
 }

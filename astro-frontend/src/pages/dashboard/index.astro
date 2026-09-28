@@ -1,52 +1,7 @@
 ---
 import Layout from "../../layouts/Layout.astro";
 import "../../styles/dashboard.css"
-import { getData } from "../../api.ts"
-import { calculateTodayProfit } from "../../charts/analysis.ts"
 import Table from "../../components/Table.astro"
-
-const sessionCookie = Astro.cookies.get("session_id")?.value
-const cookieHeader = sessionCookie ? `session_id=${sessionCookie}` : undefined
-
-const allPositions = await getData("/profit-over-time", cookieHeader)
-
-
-let portfolioValue = 0;
-let portfolioProfit = 0;
-let orginalPortfolioValue = 0;
-
-for (let cp of allPositions) {
-    portfolioValue += cp.position.currentValue;
-    portfolioProfit += cp.position.upl;
-    orginalPortfolioValue += cp.position.totalCost;
-}
-
-portfolioValue = Math.round(portfolioValue * 100) / 100
-portfolioProfit = Math.round(portfolioProfit * 100) / 100
-
-let indicator = portfolioProfit > 0 ? "+" : "";
-
-let portfolioProfitPercentage =
-    (portfolioValue - orginalPortfolioValue) / orginalPortfolioValue * 100;
-
-portfolioProfitPercentage = Math.round(portfolioProfitPercentage * 100) / 100
-
-let todaypl = calculateTodayProfit(allPositions)
-
-let previousPortfolioValue = portfolioValue - todaypl;
-let todayPercentage = (todaypl / previousPortfolioValue) * 100;
-
-todayPercentage = Math.round(todayPercentage * 100) / 100
-
-let todayPercentageIndicator = todayPercentage > 0 ? "+" : "";
-let todayIndicator = "+";
-
-if (todaypl < 0) {
-    todayIndicator = "-"
-    todaypl *= -1
-}
-
-todaypl = Math.round(todaypl * 100) / 100
 ---
 
 <Layout>
@@ -58,7 +13,7 @@ todaypl = Math.round(todaypl * 100) / 100
             </div>
 
             <div class="top-right-box">
-                <h1>{allPositions.length}</h1>
+                <h1 id="positionCount">...</h1>
                 <h2>Positions</h2>
             </div>
         </section>
@@ -73,8 +28,8 @@ todaypl = Math.round(todaypl * 100) / 100
                     </div>
 
                     <div>
-                        <h2>£{portfolioValue}</h2>
-                        <h3>{indicator}£{portfolioProfit}</h3>
+                        <h2 id="portfolioValueAmount">...</h2>
+                        <h3 id="portfolioValueProfit">...</h3>
                     </div>
                 </div>
             </div>
@@ -87,8 +42,8 @@ todaypl = Math.round(todaypl * 100) / 100
                     </div>
 
                     <div>
-                        <h2>{indicator}£{portfolioProfit}</h2>
-                        <h3>{indicator}{portfolioProfitPercentage}%</h3>
+                        <h2 id="portfolioProfitAmount">...</h2>
+                        <h3 id="portfolioProfitPercentage">...</h3>
                     </div>
                 </div>
             </div>
@@ -101,8 +56,8 @@ todaypl = Math.round(todaypl * 100) / 100
                     </div>
 
                     <div>
-                        <h2>{todayIndicator}£{todaypl}</h2>
-                        <h3>{todayPercentageIndicator}{todayPercentage}%</h3>
+                        <h2 id="todayPLAmount">...</h2>
+                        <h3 id="todayPLPercentage">...</h3>
                     </div>
                 </div>
             </div>
@@ -114,9 +69,87 @@ todaypl = Math.round(todaypl * 100) / 100
 
 </Layout>
 
+
+
 <script>
+    import { getData } from "../../api.ts"
+    import { calculateTodayProfit } from "../../charts/analysis.ts"
     import { profitOverTime } from "../../charts/lineChart.ts"
     import * as echarts from "echarts"
+
+    const allPositions = await getData("/profit-over-time")
+
+    let portfolioValue = 0
+    let portfolioProfit = 0
+    let originalPortfolioValue = 0
+
+    for (const cp of allPositions) {
+        portfolioValue += cp.position.currentValue
+        portfolioProfit += cp.position.upl
+        originalPortfolioValue += cp.position.totalCost
+    }
+
+    portfolioValue = Math.round(portfolioValue * 100) / 100
+    portfolioProfit = Math.round(portfolioProfit * 100) / 100
+
+    const indicator = portfolioProfit > 0 ? "+" : ""
+
+    let portfolioProfitPercentage =
+        (portfolioValue - originalPortfolioValue)
+        / originalPortfolioValue * 100
+
+    portfolioProfitPercentage =
+        Math.round(portfolioProfitPercentage * 100) / 100
+
+    const todayplRaw = calculateTodayProfit(allPositions)
+
+    const previousPortfolioValue = portfolioValue - todayplRaw
+
+    let todayPercentage =
+        (todayplRaw / previousPortfolioValue) * 100
+
+    todayPercentage = Math.round(todayPercentage * 100) / 100
+
+    const todayPercentageIndicator =
+        todayPercentage > 0 ? "+" : ""
+
+    let todayIndicator = "+"
+
+    let todaypl = todayplRaw
+
+    if (todaypl < 0) {
+        todayIndicator = "-"
+        todaypl *= -1
+    }
+
+    todaypl = Math.round(todaypl * 100) / 100
+
+
+    // Update HTML
+
+    document.querySelector("#positionCount").textContent =
+        allPositions.length
+
+    document.querySelector("#portfolioValueAmount").textContent =
+        `£${portfolioValue}`
+
+    document.querySelector("#portfolioValueProfit").textContent =
+        `${indicator}£${portfolioProfit}`
+
+    document.querySelector("#portfolioProfitAmount").textContent =
+        `${indicator}£${portfolioProfit}`
+
+    document.querySelector("#portfolioProfitPercentage").textContent =
+        `${indicator}${portfolioProfitPercentage}%`
+
+    document.querySelector("#todayPLAmount").textContent =
+        `${todayIndicator}£${todaypl}`
+
+    document.querySelector("#todayPLPercentage").textContent =
+        `${todayPercentageIndicator}${todayPercentage}%`
+
+
+    // Graph
 
     const profitOverTimeGraph = echarts.init(
         document.getElementById("profitOverTime")

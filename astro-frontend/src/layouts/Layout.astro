@@ -1,7 +1,6 @@
 ---
 import "../styles/style.css";
 import "../styles/navbar.css";
-import { postData } from "../api.ts";
 
 const { title = "Trading Portfolio" } = Astro.props;
 
@@ -14,6 +13,12 @@ if (!session) {
 }
 
 ---
+
+<script is:inline>
+    const privacyMode = localStorage.getItem("privacy_mode") === "true";
+
+    document.documentElement.classList.toggle("privacy_mode", privacyMode);
+</script>
 
 <!doctype html>
 <html lang="en">
@@ -56,6 +61,22 @@ if (!session) {
                     <h1 class="mobileNavbarLink">Profile</h1>
                 </a>
 
+                <a href="/admin" id="mobileAdminItem" class="adminNavItem">
+                    <h1 class"mobileNavbarLink">Admin</h1>
+                </a>
+
+                {
+                    loginState == "Logout" ? (
+                        <h1 id="mobileLogoutButton" class="mobileNavbarLink">Log out</h1>
+                    ) : (
+                        <a href="/login">
+                            <h1 class="mobileNavbarLink">Log in</h1>
+                        </a>
+                    )
+                }
+
+
+
             </div>
 
         </section>
@@ -97,6 +118,10 @@ if (!session) {
                 <a href="/profile">
                     <h1>Profile</h1>
                 </a>
+
+                <a href="/admin" id="desktopAdminItem" class="adminNavItem">
+                    <h1>Admin</h1>
+                </a>
             </div>
 
         </section>
@@ -110,7 +135,7 @@ if (!session) {
     <script>
         import { initNavbar } from "../navbar";
 
-        initNavbar();
+        await initNavbar();
     </script>
 
 </body>

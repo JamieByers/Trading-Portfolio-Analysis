@@ -1,47 +1,37 @@
 package jamie;
 
-import java.time.*;
-import java.time.format.DateTimeFormatter;
+import java.awt.image.ReplicateScaleFilter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.net.*;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.ArrayList;
-import java.util.regex.*;
 
 import org.json.JSONObject;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 record PriceChangeToday(String timestamp, double runningTotal) {};
 
 public class HttpServer {
-    public List<CombinedPosition> combined_positions;
-    public List<Position> positions;
     public HttpClient client;
     public String oldest_pos;
-
-    public Cache<String> cache;
-    public Cache<YahooPosition> yahooCache;
+    public DataCollector data;
 
     private final ObjectMapper mapper = new ObjectMapper();
 
-    public HttpServer(List<Position> positions, HttpClient client) {
-        this.positions = positions;
+    Database db;
+
+    public HttpServer(HttpClient client) {
         this.client = client;
-        this.combined_positions = null;
-        this.oldest_pos = null;
-        this.cache = new Cache<String>();
-        this.yahooCache = new Cache<YahooPosition>();
+        this.data = new DataCollector(client);
+        this.db = new Database();
     }
 
     public void initialise() {
@@ -72,50 +62,246 @@ public class HttpServer {
 
 
     public void handleRequest(Socket socket) {
-        try {
+        try (socket) {
             BufferedReader reader = new BufferedReader(
                 new InputStreamReader(socket.getInputStream())
             );
 
-            String line = reader.readLine();
-            System.out.println(line);
-            // ignore the rest of the request
-
-
-            BufferedWriter writer = new BufferedWriter(
-                new OutputStreamWriter(socket.getOutputStream()
-            ));
-
-            Request request = parse(line);
-
-            if (request.requestType.equals("GET")) {
-                route(request.path, writer);
-            } else {
-                writeResponse("Only GET requests are accepted", writer);
+            ArrayList<String> full_response = new ArrayList<String>();
+            String current_line;
+            while ((current_line = reader.readLine()) != null && !current_line.isEmpty()) {
+                full_response.add(current_line);
             }
 
-            writer.flush();
+            int contentLength = 0;
 
-            writer.close();
-            socket.close();
+            String cookie ="";
+            for (String header : full_response) {
+                if (header.toLowerCase().startsWith("content-length:")) {
+                    contentLength = Integer.parseInt(
+                        header.substring("content-length:".length()).trim()
+                    );
+                }
+
+                if (header.toLowerCase().startsWith("cookie:")) {
+                    cookie = header.substring("cookie:".length()).trim();
+                }
+            }
+
+            char[] body = new char[contentLength];
+            reader.read(body, 0, contentLength);
+
+            String requestBody = new String(body);
+
+            cookie = getSessionIDFromCookie(cookie);
+            Request request = parse(full_response.get(0), requestBody, cookie);
+
+            System.out.println("Request: " + request);
+            System.out.println("Body: " + requestBody);
+            System.out.println();
+
+            try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()))) {
+                route(request, writer);
+            }
+
         } catch (Exception e) {
-            System.out.println(e);
+            e.printStackTrace();
         }
     }
 
-    public void print(String[] l) {
-        for ( String el : l ) {
-            System.out.println(el);
-        }
-        System.out.println();
-    }
-
-    public void route(String path, BufferedWriter writer) throws Exception {
-        String cache = this.cache.getFromCache(path);
-        if (cache != null) {
-            writeResponse(cache, writer);
+    public void route(Request request, BufferedWriter writer) throws Exception {
+        if (request.requestType().equals("OPTIONS")) {
+            Responder.handleOptionsRequest(writer);
             return;
         }
+
+        if (request.requestType.equals("GET")) {
+            handleGetRequest(request, writer);
+        } else if (request.requestType.equals("POST")) {
+            handlePostRequest(request, writer);
+        }
+
+    }
+
+    public void handlePostRequest(Request request, BufferedWriter writer) throws Exception {
+        String cookie = request.cookie;
+        String user_id = this.db.getUserIDFromSession(cookie);
+
+        String path = request.path;
+        if (path.startsWith("/api")) {
+            path = path.substring(4);
+        }
+
+        JSONObject body = new JSONObject(request.body);
+
+        String email;
+        String password;
+
+        switch (path) {
+            case "/login":
+                email = body.getString("email");
+                password = body.getString("password");
+
+                loginUser(email, password, writer);
+
+                break;
+
+            case "/logout":
+                if (!cookie.isEmpty()) {
+                    this.db.deleteSessionsWithSessionID(cookie);
+                    Responder.writeLogoutResponse("Logging out user: " + cookie, writer);
+                } else {
+                    Responder.writeErrorResponse("No cookie exists for: " + cookie, writer);
+                }
+
+                break;
+
+            case "/register":
+                email = body.getString("email");
+                password = body.getString("password");
+
+                boolean createdUser = this.db.createUser(email, password);
+
+                if (createdUser) {
+                    loginUser(email, password, writer);
+                } else {
+                    Responder.writeErrorResponse("Error: Users already exists?", writer);
+                }
+
+                break;
+
+            case "/editAccountSettings":
+                email = body.getString("email");
+                password = body.getString("password");
+                String confirm_password = body.getString("confirm_password");
+
+                System.out.println("Editing email and password " +  email + password);
+
+                boolean[] editedUser = this.db.editUserEmailOrPassword(user_id, email, password, confirm_password);
+
+                System.out.println("edited users: " + editedUser);
+
+                if (editedUser[0] && editedUser[1]) {
+                    Responder.writeResponse("Successfully changed email and password", writer);
+                } else if (editedUser[0] && !editedUser[1]) {
+                    Responder.writeResponse("Only changed email", writer);
+                } else if (!editedUser[0] && editedUser[1]) {
+                    Responder.writeResponse("Only changed password", writer);
+                } else {
+                    Responder.writeErrorResponse("Unable to change email and password", writer);
+                }
+
+                break;
+
+            case "/addTradingKeys":
+                String publicKey = body.getString("publicKey");
+                String privateKey = body.getString("privateKey");
+
+                String tradingKeyUUID = this.db.createTradingKey(publicKey, privateKey, user_id);
+
+                if (!tradingKeyUUID.isEmpty()) {
+                    Responder.writeResponse("Keys Added!", writer);
+                } else {
+                    Responder.writeErrorResponse("Error: Trading Key could not be created.", writer);
+                }
+
+                break;
+
+            case "/togglePrivacyMode":
+                System.out.println("Toggling privacy setting");
+                boolean toggledPrivacyMode = this.db.togglePrivacyMode(user_id);
+
+                System.out.println("Changed privacy mode: " + toggledPrivacyMode);
+
+                if (toggledPrivacyMode) {
+                    Responder.writeResponse("Toggled Privacy Mode", writer);
+                } else {
+                    Responder.writeErrorResponse("Failed to toggle privacy mode", writer);
+                }
+
+                break;
+
+            case "/toggleLarpMode":
+                System.out.println("Toggling larp setting");
+                boolean toggledLarpMode = this.db.toggleLarpMode(user_id);
+
+                System.out.println("Changed larp mode: " + toggledLarpMode);
+
+                if (toggledLarpMode) {
+                    Responder.writeResponse("Toggled Privacy Mode", writer);
+                } else {
+                    Responder.writeErrorResponse("Failed to toggle larp mode", writer);
+                }
+
+                break;
+
+
+            case "/deleteUser":
+                System.out.println("Deleting user: " + user_id);
+                boolean deletedUser = this.db.deleteUser(user_id);
+
+                if (deletedUser) {
+                    Responder.writeResponse("Successfully deleted user: " + user_id, writer);
+                } else {
+                    Responder.writeErrorResponse("Could not delete user: " + user_id, writer);
+                }
+
+                break;
+
+            default:
+                Responder.writeResponse("Error path not recognised: " + path, writer);
+
+                break;
+        }
+    }
+
+    public String getSessionIDFromCookie(String cookie) {
+        if (cookie == null || cookie.isEmpty()) {
+            return "";
+        }
+
+        for (String part : cookie.split(";")) {
+            part = part.trim();
+
+            if (part.startsWith("session_id=")) {
+                return part.substring("session_id=".length());
+            }
+        }
+
+        return "";
+    }
+
+    public void loginUser(String email, String password, BufferedWriter writer) throws Exception {
+        String loggedIn = this.db.loginUser(email, password);
+        System.out.println("logged in: " + loggedIn);
+
+        if (!loggedIn.isEmpty()) {
+            this.db.deleteSessionsWithId(loggedIn);
+            String session_id = this.db.createSession(loggedIn);
+
+            Responder.writeCookieResponse("Logged in user! " + email + " | " + session_id, session_id, writer);
+        } else {
+            Responder.writeResponse("User does not exist", writer);
+        }
+
+    }
+
+    public void handleGetRequest(Request request, BufferedWriter writer) throws Exception {
+        String user_id = this.db.getUserIDFromSession(request.cookie);
+        HashMap<String, String> user = this.db.selectFromUsersUsingID(user_id);
+
+        if (user_id.isEmpty()) {
+            Responder.writeErrorResponse("Cookie doesnt exist: " + request.cookie, writer);
+            return;
+        }
+
+        String path = request.path;
+        String cacheKey = user_id + request.path;
+
+        String[] tradingKeys = this.db.getTradingKeysWithUserID(user_id);
+
+        List<Position> positions = this.data.getPositions(user_id, tradingKeys);
+
 
         // /api/all?range=...&interval=.../...
         String route = path;
@@ -123,52 +309,66 @@ public class HttpServer {
             route = route.substring(4);
         }
 
-        String[] split_route = route.split("\\/");
+        System.out.println("ROUTE: " + route);
+
+        String[] path_levels = route.split("\\/");
+        System.out.println("PATH LEVELS: " + Arrays.toString(path_levels));
 
         // [/all?range=...&interval=..., /...]
-        String[] split_path = split_route[1].split("\\?");
+        String[] split_path = path_levels[1].split("\\?");
+        System.out.println("SPLIT PATH : " + Arrays.toString(split_path));
 
         // ["/all", "range=...&interval=..."]
         String matching_path = split_path[0];
+        System.out.println("MATCHING PATH" + matching_path);
         HashMap<String, String> params = handleParams(split_path);
 
 
         // "/all"
-        System.out.println("Matching path: "+ matching_path);
         switch (matching_path) {
-            case "coffee":
-                writeResponse("Coffee!!!!", writer);
-                break;
-
             case "all":
-                List<CombinedPosition> combinedPositionsAll = getCombinedPositions(params);
-                this.combined_positions = combinedPositionsAll;
+                List<CombinedPosition> combinedPositionsAll = data.getCombinedPositions(params, positions);
+
                 String json = mapper.writeValueAsString(combinedPositionsAll);
 
-                this.cache.addToCache(path, json);
-                writeResponse(json.toString(), writer);
+                this.data.cache.addToCache(cacheKey, json);
+                Responder.writeResponse(json, writer);
                 break;
 
             case "positions":
-                String positionsJson = mapper.writeValueAsString(this.positions);
-                writeResponse(positionsJson, writer);
+                String positionsJson = mapper.writeValueAsString(positions);
+                Responder.writeResponse(positionsJson, writer);
                 break;
 
             case "profit-over-time":
                 List<CombinedPosition> cps = new ArrayList<>();
-                for ( Position p : this.positions ) {
+
+                for (Position p : positions) {
                     HashMap<String, String> params_map = new HashMap<>();
-                    params_map.put("range", "range="+p.holdingTime+"d");
+                    params_map.put("range", "range=" + p.holdingTime + "d");
                     params_map.put("interval", "interval=1d");
 
-                    YahooPosition yp = getYahooInformation(p.possibleYahooTicker, params_map);
-                    CombinedPosition cp = new CombinedPosition(p, yp);
+                    YahooPosition yp;
 
+                    try {
+                        yp = this.data.getYahooInformation(
+                            p.possibleYahooTicker,
+                            params_map
+                        );
+
+                    } catch (Exception e) {
+                        continue;
+                    }
+
+                    CombinedPosition cp = new CombinedPosition(p, yp);
                     double runningTotal = p.totalCost;
 
                     for (TimestampElement te : yp.timestamp_elements) {
-                        double priceChangePercentageAbsolute = te.priceChangePercentage / 100;
+                        double priceChangePercentageAbsolute =
+                            te.priceChangePercentage / 100;
+
                         double change = 1 + priceChangePercentageAbsolute;
+
                         runningTotal *= change;
 
                         te.profit = runningTotal - p.totalCost;
@@ -179,8 +379,52 @@ public class HttpServer {
 
                 String cpsJson = mapper.writeValueAsString(cps);
 
-                this.cache.addToCache(path, cpsJson);
-                writeResponse(cpsJson, writer);
+                this.data.cache.addToCache(cacheKey, cpsJson);
+
+                Responder.writeResponse(cpsJson, writer);
+
+
+                break;
+
+            case "userDetails":
+                HashMap<String, String> userDetails = this.db.selectFromUsersUsingID(user_id);
+
+                String userDetailsJson = new JSONObject(userDetails).toString();
+
+                Responder.writeResponse(userDetailsJson, writer);
+
+                break;
+
+            case "accountSettingsDetails":
+                HashMap<String, String> accountSettingsDetails = this.db.getAccountSettingsWithUserID(user_id);
+
+                if (accountSettingsDetails == null) {
+                    Responder.writeErrorResponse("No account settings found for user: " + user_id,  writer);
+                } else {
+                    String accountSettingsDetailsJSON = new JSONObject(accountSettingsDetails).toString();
+                    Responder.writeResponse(accountSettingsDetailsJSON, writer);
+                }
+
+                break;
+
+            case "database":
+                if (path_levels.length < 3) {
+                    Responder.writeErrorResponse("Missing a path for database get request.", writer);
+                    break;
+                }
+
+                if (!user.get("user_type").equals("ADMIN")) {
+                    Responder.writeErrorResponse("You do not have admin status to access this data.", writer);
+                    break;
+                }
+
+                String databaseJSON = handleDatabaseGetRequests(path_levels[2]);
+
+                if (databaseJSON == null) {
+                    Responder.writeErrorResponse("No path exists for database data: " + path_levels[2], writer);
+                }
+
+                Responder.writeResponse(databaseJSON, writer);
 
                 break;
 
@@ -192,28 +436,49 @@ public class HttpServer {
                 }
 
 
-                if (pos == null || (split_route.length > 2 && split_route[1] == "exact")) {
-                    YahooPosition yp = getYahooInformation(matching_path, params);
+                if (pos == null || (path_levels.length > 2 && path_levels[1].equals("exact"))) {
+                    YahooPosition yp = this.data.getYahooInformation(matching_path, params);
                     CombinedPosition new_cp = new CombinedPosition(null, yp);
-                    new_cp.yahooPosition.print();
                     String new_cp_json = new_cp.toJson();
 
-                    this.cache.addToCache(path, new_cp_json);
-                    writeResponse(new_cp_json, writer);
+                    this.data.cache.addToCache(cacheKey, new_cp_json);
+                    Responder.writeResponse(new_cp_json, writer);
                     break;
                 } else {
-                    CombinedPosition new_cp = getCombinedPosition(pos, params);
+                    CombinedPosition new_cp = this.data.getCombinedPosition(pos, params);
                     String new_cp_json = new_cp.toJson();
 
-                    this.cache.addToCache(path, new_cp_json);
-                    writeResponse(new_cp_json, writer);
+                    this.data.cache.addToCache(cacheKey, new_cp_json);
+                    Responder.writeResponse(new_cp_json, writer);
                     break;
                 }
         }
+
     }
 
+    public String handleDatabaseGetRequests(String path) throws Exception {
+        HashMap<String, ArrayList<String>> data;
+        switch (path) {
+            case "users":
+                data = this.db.getAllUserData();
+                break;
+            case "tradingKeys":
+                data = this.db.getAllTradingKeysData();
+                break;
+            case "sessions":
+                data = this.db.getAllSessionData();
+                break;
+            default:
+                data = null;
+                break;
+        }
 
+        String databaseJSON = new JSONObject(data).toString();
+        System.out.println(databaseJSON);
 
+        return databaseJSON;
+
+    }
 
     public HashMap<String, String> handleParams(String[] split_path) {
         HashMap<String, String> param_details = new HashMap<String, String>();
@@ -245,7 +510,6 @@ public class HttpServer {
     }
 
     public CombinedPosition linearSearch(String ticker, List<CombinedPosition> combinedPositions) {
-        System.out.println("linear searchign " + ticker);
         for ( CombinedPosition pos : combinedPositions ) {
             if (pos.position.ticker.contains(ticker)) {
                 return pos;
@@ -255,166 +519,14 @@ public class HttpServer {
     }
 
 
-    public record Request (String requestType, String path) {}
+    public record Request (String requestType, String path, String body, String cookie) {}
 
-    public Request parse(String request) {
+    public Request parse(String request, String body, String cookie) {
         String[] keywords = request.split(" ");
         String requestType = keywords[0];
         String path = keywords[1];
 
-        return new Request(requestType, path);
-    }
-
-    public void writeResponse(String message, BufferedWriter writer) throws Exception {
-        writer.write("HTTP/1.1 200 OK\r\n");
-        writer.write("Content-Type: application/json\r\n");
-        writer.write("Access-Control-Allow-Origin: *\r\n");
-        writer.write("Content-Length: " + message.length() + "\r\n");
-        writer.write("\r\n");
-        writer.write(message);
-    }
-
-    public YahooPosition getYahooInformation(String ticker, HashMap<String, String> parameters) {
-        System.out.println(parameters);
-
-        // Valid intervals: [1m, 2m, 5m, 15m, 30m, 60m, 90m, 1h, 4h, 1d, 5d, 1wk, 1mo, 3mo]
-
-        String input_timestamp = parameters.getOrDefault("timestamp", parameters.getOrDefault("ts", "")); // example ts: 19-07-26
-        String range = parameters.getOrDefault("range", "range=1mo");
-
-        // TODO: figure out this silly custom timestamping
-        if (input_timestamp != "") {
-            String custom_timestamp = input_timestamp.split("=")[1];
-            System.out.println(custom_timestamp);
-
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-yy");
-            LocalDate date = LocalDate.parse(custom_timestamp, formatter);
-            System.out.println(date);
-
-            Instant start = date.atStartOfDay(ZoneId.systemDefault()).toInstant();
-            Instant end = Instant.now();
-
-            long minimum_range = Duration.between(start, end).toDays();
-            System.out.println(minimum_range);
-
-            String range_time = range.split("=")[1];
-            System.out.println(range_time);
-
-            Pattern pattern = Pattern.compile("(\\d+)(mo|wk|m|d|h)");
-            Matcher matcher = pattern.matcher(range_time);
-
-            if (matcher.matches()) {
-                long range_value = Integer.parseInt(matcher.group(1));
-                String range_period = matcher.group(2);
-                System.out.println(range_value + " " + range_period);
-
-                double mult = 0;
-                switch (range_period) {
-                    case "mo":
-                        mult = 31;
-                        break;
-                    case "wk":
-                        mult = 7;
-                        break;
-                    case "d":
-                        mult = 1;
-                        break;
-                    case "h":
-                        mult = 1 / 24;
-                        break;
-                    case "m":
-                        mult = 1 / 1440;
-                        break;
-                }
-
-                double current_value = range_value * mult;
-                System.out.println("current val "+ current_value + " " + mult);
-                if (mult > 0 && minimum_range > current_value) {
-                    minimum_range -= Math.floor(minimum_range / 7) * 2 ;
-                    range = "range=" + minimum_range + "d";
-                    System.out.println(range);
-                }
-
-            }
-
-        }
-
-
-        String api_path = ticker
-            + "?"
-            + parameters.getOrDefault("interval", "interval=1d")
-            + "&"
-            + range;
-
-        YahooPosition cache_hit = this.yahooCache.getFromCache(api_path);
-        if (cache_hit != null) {
-            return cache_hit;
-        }
-
-        HttpRequest request = HttpRequest.newBuilder()
-            .uri(URI.create("https://query1.finance.yahoo.com/v8/finance/chart/"
-            + api_path
-            )
-            )
-            .header("User-Agent","Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36")
-            .header("Accept", "application/json")
-            .GET()
-            .build();
-
-        try {
-            HttpResponse<String> response = this.client.send(
-                request, HttpResponse.BodyHandlers.ofString()
-            );
-
-            System.out.println(response);
-            JSONObject json = new JSONObject(response.body());
-            YahooPosition ypos = new YahooPosition(json);
-
-            this.yahooCache.addToCache(api_path, ypos);
-            return ypos;
-
-        } catch (Exception e) {
-            String message = "YahooPosition fetch error";
-            throw new RuntimeException(message + e);
-        }
-
-    }
-
-    public CombinedPosition getCombinedPosition(Position pos, HashMap<String, String> params) {
-        YahooPosition ypos = getYahooInformation(pos.possibleYahooTicker, params);
-        CombinedPosition combinedPosition = new CombinedPosition(pos, ypos);
-        return combinedPosition;
-    }
-
-    public List<CombinedPosition> getCombinedPositions(HashMap<String, String> params) {
-        List<CombinedPosition> combined_positions = new ArrayList<CombinedPosition>();
-        List<Thread> threads = new ArrayList<>();
-
-        for (Position pos : this.positions) {
-
-            Thread thread = new Thread(() -> {
-                CombinedPosition cp = getCombinedPosition(pos, params);
-
-                synchronized (combined_positions) {
-                    combined_positions.add(cp);
-                }
-            });
-
-            threads.add(thread);
-            thread.start();
-        }
-
-        for (Thread thread : threads) {
-            try {
-                thread.join();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-        this.combined_positions = combined_positions;
-        return combined_positions;
-
+        return new Request(requestType, path, body, cookie);
     }
 
 }

@@ -43,7 +43,7 @@
 
     <h1 id="deleteAccount">Delete Account</h1>
 
-    <form action="">
+    <form action="" id="deleteAccountForm">
         <h2>Once you delete your account you can easily create a new one, but no settings will remain.</h2>
         <button id="deleteButton">Delete Profile</button>
     </form>
@@ -53,14 +53,14 @@
     <form class="checkboxRows" action="">
         <div class="checkboxRow">
             <div class="checkboxToggle">
-                <input type="checkbox"><h2>Turn on privacy mode</h2>
+                <input type="checkbox" id="privacyModeCheckbox"><h2>Turn on privacy mode</h2>
             </div>
             <div class="note">This will hide any absolute data about your personal portfolio like portfolio value, total P/L and today P/L, it will however still show graph analysis. </div>
         </div>
 
         <div class="checkboxRow">
             <div class="checkboxToggle">
-                <input type="checkbox"><h2>Turn on larp mode</h2>
+                <input type="checkbox" id="larpModeCheckbox"><h2>Turn on larp mode</h2>
             </div>
             <div class="note">This will lie about any of your data from your personal portfolio like portfolio value, total P/L and today P/L. </div>
         </div>

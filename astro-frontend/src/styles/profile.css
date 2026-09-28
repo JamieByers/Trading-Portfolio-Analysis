@@ -206,16 +206,14 @@ button {
 
 
 @media (max-width: 768px) {
+    /* .sidebar { */
+    /*     width: 100vw; */
+    /*     height: 100vh; */
+    /*     position: absolute; */
+    /*     z-index: 1; */
+    /* } */
     .sidebar {
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
-        z-index: 1;
-    }
-    .settingsBody {
-        width: 100vw;
-        height: 100vh;
-        position: absolute;
+        display: none;
     }
     .cog {
         display: flex;
@@ -223,4 +221,8 @@ button {
 
     }
 
+    .keyInputs {
+        flex-direction: column;
+
+    }
 }

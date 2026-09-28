@@ -1,0 +1,28 @@
+CREATE TABLE users (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    password_hash TEXT NOT NULL
+);
+
+CREATE TABLE trading_keys (
+    id INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+    public TEXT NOT NULL,
+    private TEXT NOT NULL
+);
+
+CREATE TABLE sessions (
+    id TEXT PRIMARY KEY,
+    user_id INTEGER NOT NULL,
+    expires_at TIMESTAMP NOT NULL,
+
+    CONSTRAINT sessions_user_fk
+        FOREIGN KEY (user_id)
+        REFERENCES users(id)
+        ON DELETE CASCADE
+);
+
+CREATE TABLE account_settings (
+    user_id INTEGER PRIMARY KEY REFERENCES users(id) ON DELETE CASCADE,,
+    privacy_mode BOOLEAN NOT NULL DEFAULT FALSE,
+    larp_mode BOOLEAN NOT NULL DEFAULT FALSE
+);

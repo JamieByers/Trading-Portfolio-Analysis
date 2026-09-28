@@ -1,0 +1,31 @@
+---
+    import Layout from "../../layouts/Layout.astro";
+    import "../../styles/admin.css"
+---
+
+<Layout>
+
+    <section class="databaseTitleBar">
+        <h1 class="font-bold text-lg">Databases: </h1>
+
+        <h1 id="databaseUsersButton" data-path="users">Users</h1>
+        <h1 id="databaseTradingKeysButton" data-path="tradingKeys">Trading Keys</h1>
+        <h1 id="databaseSessionsButton" data-path="sessions">Sessions</h1>
+    </section>
+
+    <section id="adminPage" class="adminPage">
+        <div id="tableWrapper">
+            <table class="adminPageTable" id="adminPageTable">
+
+            </table>
+        </div>
+    </section>
+
+</Layout>
+
+<script>
+    import { initAdmin } from "../../admin.ts"
+
+    initAdmin()
+
+</script>
