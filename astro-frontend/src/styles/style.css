@@ -195,8 +195,10 @@ table {
     border-top: 1.5px solid rgba(0,0,0,0.4);
 }
 
-
-
+.private-data {
+    filter: blur(8px);
+    user-select: none;
+}
 
 
 @media (max-width: 768px) {

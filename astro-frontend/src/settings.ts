@@ -63,18 +63,27 @@ privacyModeCheckboxElement.addEventListener("change", async () => {
     console.log(checkboxResponse);
 })
 
-const larpModeCheckboxElement = document.getElementById("larpModeCheckbox") as HTMLInputElement
-const larpModeToggled = userSettings.privacy_mode;
-if (larpModeToggled == "true") {
-    larpModeCheckboxElement.checked = true;
+
+
+const darkModeCheckboxElement = document.getElementById("darkModeCheckbox") as HTMLInputElement
+console.log(darkModeCheckboxElement)
+const darkModeToggled = userSettings.dark_mode;
+if (darkModeToggled == "true") {
+    darkModeCheckboxElement.checked = true;
 } else {
-    larpModeCheckboxElement.checked = false;
+    darkModeCheckboxElement.checked = false;
 }
 
-larpModeCheckboxElement.addEventListener("change", async () => {
-    const checkboxLarpResponse = await postData("/toggleLarpMode", {})
-    console.log(checkboxLarpResponse);
+darkModeCheckboxElement.addEventListener("change", async () => {
+    const checkboxResponse = await postData("/toggleDarkMode", {})
+    console.log(checkboxResponse);
 })
+
+
+
+
+
+
 
 
 const deleteForm = document.getElementById("deleteAccountForm")

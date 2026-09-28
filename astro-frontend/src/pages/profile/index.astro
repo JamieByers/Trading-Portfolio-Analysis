@@ -23,7 +23,11 @@
 
         <div class="settingsRow">
             <h2>Email </h2>
-            <input type="text" name="email" id="email" class="settingsInput">
+            <div>
+                <input type="text" name="email" id="email" class="settingsInput">
+                <!-- TODO : Add email verification for future email updates -->
+                <!-- <button id="verifyEmailButton">Verify Email</button> -->
+            </div>
             <div class="note">This will be the email used to recover your account and log in.</div>
         </div>
 
@@ -41,12 +45,6 @@
         <button type="submit">Update Profile</button>
     </form>
 
-    <h1 id="deleteAccount">Delete Account</h1>
-
-    <form action="" id="deleteAccountForm">
-        <h2>Once you delete your account you can easily create a new one, but no settings will remain.</h2>
-        <button id="deleteButton">Delete Profile</button>
-    </form>
 
     <h1 id="accountPreferences">Account Preferences</h1>
 
@@ -60,10 +58,17 @@
 
         <div class="checkboxRow">
             <div class="checkboxToggle">
-                <input type="checkbox" id="larpModeCheckbox"><h2>Turn on larp mode</h2>
+                <input type="checkbox" id="darkModeCheckbox"><h2>Turn on dark mode</h2>
             </div>
-            <div class="note">This will lie about any of your data from your personal portfolio like portfolio value, total P/L and today P/L. </div>
+            <div class="note">This will change the theme of the website to dark mode</div>
         </div>
+
+        <!-- <div class="checkboxRow"> -->
+        <!--     <div class="checkboxToggle"> -->
+        <!--         <input type="checkbox" id="larpModeCheckbox"><h2>Turn on larp mode</h2> -->
+        <!--     </div> -->
+        <!--     <div class="note">This will lie about any of your data from your personal portfolio like portfolio value, total P/L and today P/L. </div> -->
+        <!-- </div> -->
     </form>
 
     <h1 id="tradingKeys">Trading Keys</h1>
@@ -87,6 +92,12 @@
         <button>Update Keys</button>
     </form>
 
+    <h1 id="deleteAccount">Delete Account</h1>
+
+    <form action="" id="deleteAccountForm">
+        <h2>Once you delete your account you can easily create a new one, but no settings will remain.</h2>
+        <button id="deleteButton">Delete Profile</button>
+    </form>
 
     <!-- <!-1- Rounded switch -1-> -->
     <!-- <label class="switch"> -->

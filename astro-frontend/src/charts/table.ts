@@ -126,15 +126,15 @@ function createRow(stock: StockRow) {
     let pcp = Math.round(stock.priceChangePercentage * 100) / 100
 
     row.innerHTML = `
-            <td class="w-2/5">
+            <td class="w-2/5" data-private>
                 ${stock.name} |
                 ${stock.ticker}
             </td>
 
-            <td>${stock.totalpl} (${stock.totalplPercentage}%)</td>
-            <td>${stock.todaypl} (${pcp}%) ${stock.todaypl > 0 ? "▲" : "▼"}</td>
-            <td>${stock.volatility}</td>
-            <td>${stock.holdingTimeDays}</td>
+            <td data-private>${stock.totalpl} (${stock.totalplPercentage}%)</td>
+            <td data-private>${stock.todaypl} (${pcp}%) ${stock.todaypl > 0 ? "▲" : "▼"}</td>
+            <td data-private>${stock.volatility}</td>
+            <td data-private>${stock.holdingTimeDays}</td>
     `
 
     let ticker = stock.ticker;
