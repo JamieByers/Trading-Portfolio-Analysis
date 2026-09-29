@@ -1,7 +1,6 @@
 import * as types from "./types"
 
-type Cache = Map<string, string>
-let cache: Cache = new Map<string, string>()
+let cache= new Map<string, any>()
 
 export async function getData(path: string) {
     let url: string;
@@ -14,7 +13,9 @@ export async function getData(path: string) {
             : "/api"
     }
 
-    if (cache.get(path) != null && cache.get(path) != "") { return cache.get(path) }
+    if (cache.has(path)) {
+        return cache.get(path)
+    }
 
     const response = await fetch(url + path, {
         credentials: "include",
@@ -25,7 +26,11 @@ export async function getData(path: string) {
         throw new Error(`HTTP ${response.status}: ${response.statusText} || ${error}`)
     }
 
-    return response.json()
+    const json = await response.json();
+
+    cache.set(path, json);
+
+    return json;
 }
 
 
@@ -56,6 +61,10 @@ export async function postData(path, body) {
 
     return response
 
+}
+
+export function clearCache() {
+    cache.clear();
 }
 
 type TodayElement = {

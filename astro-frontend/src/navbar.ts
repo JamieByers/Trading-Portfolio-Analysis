@@ -1,4 +1,4 @@
-import { postData, getData } from "./api";
+import { postData, getData, clearCache } from "./api";
 
 export async function initNavbar() {
     const toggle = document.querySelector<HTMLButtonElement>('.nav-toggle');
@@ -23,7 +23,8 @@ const logoutButton = document.getElementById("logoutButton")
 logoutButton?.addEventListener("click", async () => {
     await postData("/logout", {})
 
-    window.location.href = "/login"
+    clearCache();
+    window.location.href = "/login";
 })
 
 const mobileLogoutButton = document.getElementById("mobileLogoutButton")
