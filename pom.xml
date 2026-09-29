@@ -56,6 +56,19 @@
         <version>20250107</version>
       </dependency>
 
+      <!-- Flyway -->
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>11.13.1</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
+        <version>11.13.1</version>
+      </dependency>
+
     </dependencies>
   </dependencyManagement>
 
@@ -92,28 +105,37 @@
       <version>2.19.2</version>
     </dependency>
 
+    <!-- Flyway -->
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-core</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.flywaydb</groupId>
+      <artifactId>flyway-database-postgresql</artifactId>
+    </dependency>
+
+    <!-- postgresql -->
+    <dependency>
+      <groupId>org.postgresql</groupId>
+      <artifactId>postgresql</artifactId>
+      <version>42.7.8</version>
+    </dependency>
+
+    <!-- Argon2id -->
+    <dependency>
+      <groupId>de.mkammerer</groupId>
+      <artifactId>argon2-jvm</artifactId>
+      <version>2.12</version>
+    </dependency>
+
     <!-- JUnit -->
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
       <scope>test</scope>
     </dependency>
-
-    <!-- postgresql -->
-    <dependency>
-        <groupId>org.postgresql</groupId>
-        <artifactId>postgresql</artifactId>
-        <version>42.7.8</version>
-    </dependency>
-
-    <!-- Argon2id -->
-    <dependency>
-        <groupId>de.mkammerer</groupId>
-        <artifactId>argon2-jvm</artifactId>
-        <version>2.12</version>
-    </dependency>
-
-
 
     <dependency>
       <groupId>org.junit.jupiter</groupId>
@@ -211,6 +233,9 @@
                   <mainClass>jamie.App</mainClass>
                 </transformer>
 
+                <!-- Merges META-INF/services files (needed so Flyway finds its PostgreSQL plugin in the fat JAR) -->
+                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+
               </transformers>
 
             </configuration>
@@ -218,6 +243,25 @@
           </execution>
         </executions>
 
+      </plugin>
+
+      <!-- Flyway Maven plugin (enables mvn flyway:info / migrate) -->
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>11.13.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>11.13.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+          </dependency>
+        </dependencies>
       </plugin>
 
     </plugins>

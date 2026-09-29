@@ -221,16 +221,16 @@ public class HttpServer {
 
                 break;
 
-            case "/toggleLarpMode":
-                System.out.println("Toggling larp setting");
-                boolean toggledLarpMode = this.db.toggleLarpMode(user_id);
+            case "/toggleDarkMode":
+                System.out.println("Toggling dark mode setting");
+                boolean toggledDarkMode = this.db.toggleDarkMode(user_id);
 
-                System.out.println("Changed larp mode: " + toggledLarpMode);
+                System.out.println("Changed dark mode: " + toggledDarkMode);
 
-                if (toggledLarpMode) {
-                    Responder.writeResponse("Toggled Privacy Mode", writer);
+                if (toggledDarkMode) {
+                    Responder.writeResponse("Toggled Dark Mode", writer);
                 } else {
-                    Responder.writeErrorResponse("Failed to toggle larp mode", writer);
+                    Responder.writeErrorResponse("Failed to toggle Dark Mode", writer);
                 }
 
                 break;

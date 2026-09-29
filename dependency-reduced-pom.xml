@@ -66,10 +66,28 @@
                 <transformer>
                   <mainClass>jamie.App</mainClass>
                 </transformer>
+                <transformer />
               </transformers>
             </configuration>
           </execution>
         </executions>
+      </plugin>
+      <plugin>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-maven-plugin</artifactId>
+        <version>11.13.1</version>
+        <dependencies>
+          <dependency>
+            <groupId>org.flywaydb</groupId>
+            <artifactId>flyway-database-postgresql</artifactId>
+            <version>11.13.1</version>
+          </dependency>
+          <dependency>
+            <groupId>org.postgresql</groupId>
+            <artifactId>postgresql</artifactId>
+            <version>42.7.8</version>
+          </dependency>
+        </dependencies>
       </plugin>
     </plugins>
   </build>
@@ -151,6 +169,16 @@
         <groupId>org.json</groupId>
         <artifactId>json</artifactId>
         <version>20250107</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-core</artifactId>
+        <version>11.13.1</version>
+      </dependency>
+      <dependency>
+        <groupId>org.flywaydb</groupId>
+        <artifactId>flyway-database-postgresql</artifactId>
+        <version>11.13.1</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

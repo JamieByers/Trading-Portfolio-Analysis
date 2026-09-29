@@ -361,10 +361,10 @@ public class Database {
             }
 
             boolean privacy_mode = rs.getBoolean("privacy_mode");
-            boolean larp_mode = rs.getBoolean("larp_mode");
+            boolean dark_mode = rs.getBoolean("dark_mode");
 
             map.put("privacy_mode", Boolean.toString(privacy_mode));
-            map.put("larp_mode", Boolean.toString(larp_mode));
+            map.put("dark_mode", Boolean.toString(dark_mode));
 
             return map;
         }
@@ -480,7 +480,7 @@ public class Database {
             }
         }
     }
-    public boolean toggleLarpMode(String user_id) throws Exception {
+    public boolean toggleDarkMode(String user_id) throws Exception {
         String sql = "SELECT * FROM account_settings WHERE user_id = ?";
         int id = Integer.parseInt(user_id);
 
@@ -493,10 +493,10 @@ public class Database {
                 return false;
             }
 
-            boolean status = rs.getBoolean("larp_mode");
+            boolean status = rs.getBoolean("dark_mode");
             boolean newStatus = !status;
 
-            String updateSql = "UPDATE account_settings SET larp_mode = ? WHERE user_id = ?";
+            String updateSql = "UPDATE account_settings SET dark_mode = ? WHERE user_id = ?";
 
             try (PreparedStatement ust = db.prepareStatement(updateSql)) {
                 ust.setBoolean(1, newStatus);
