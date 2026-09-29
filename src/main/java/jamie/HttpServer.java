@@ -280,7 +280,7 @@ public class HttpServer {
 
             Responder.writeCookieResponse("Logged in user! " + email + " | " + session_id, session_id, writer);
         } else {
-            Responder.writeResponse("User does not exist", writer);
+            Responder.writeErrorResponse("Error: User does not exist", writer);
         }
 
     }

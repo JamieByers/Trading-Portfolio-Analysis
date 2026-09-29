@@ -14,12 +14,24 @@ loginForm.addEventListener("submit", async (event) => {
         password: formData.get("password")
     }
 
-    const response = await postData("/login", body)
-    console.log(response)
-    console.log(await response.text())
+    try {
+        const response = await postData("/login", body)
 
-    if (response.status == 200) {
-        window.location.pathname = "/"
+        console.log(response)
+        console.log(await response.text())
+
+        if (response.status == 200) {
+            window.location.pathname = "/"
+        }
+    } catch (error) {
+        console.log("ERROR ERROR ERROR")
+        console.log(error)
+
+        const errorMessageElement = document.getElementById("errorMessage")
+
+        if (errorMessageElement) {
+            errorMessageElement.innerHTML = "Error: Username or password is incorrect"
+        }
     }
 
 });

@@ -188,7 +188,7 @@ public class Database {
     public String createSession(String id) throws Exception {
         HashMap<String, String> user = selectFromUsersUsingID(id);
 
-        String interval = "30 mins";
+        String interval = "60 mins";
         if (user.get("user_type").equals("ADMIN")) {
             interval = "999999 mins";
         }

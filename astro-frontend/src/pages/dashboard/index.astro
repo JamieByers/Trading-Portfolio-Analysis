@@ -2,6 +2,13 @@
 import Layout from "../../layouts/Layout.astro";
 import "../../styles/dashboard.css"
 import Table from "../../components/Table.astro"
+
+const session = Astro.cookies.get("session_id");
+
+if (!session) {
+    return Astro.redirect("/login");
+}
+
 ---
 
 <Layout>

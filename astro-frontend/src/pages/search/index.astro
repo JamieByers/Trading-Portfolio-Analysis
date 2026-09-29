@@ -1,6 +1,12 @@
 ---
     import "../../styles/search.css"
     import Layout from "../../layouts/Layout.astro"
+
+    const session = Astro.cookies.get("session_id");
+
+    if (!session) {
+        return Astro.redirect("/login");
+    }
 ---
 
 <Layout>
