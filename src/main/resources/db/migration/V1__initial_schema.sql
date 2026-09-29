@@ -2,8 +2,6 @@
 -- PostgreSQL database dump
 --
 
-\restrict SyJ14yTbDnHW0KuARqzSSU6r6rtSYIQRAmmhE6ZkQdJM4Feew5IIbQI0eo2JXc4
-
 -- Dumped from database version 18.6 (Homebrew)
 -- Dumped by pg_dump version 18.6 (Homebrew)
 
@@ -150,6 +148,4 @@ ALTER TABLE ONLY public.trading_keys
 --
 -- PostgreSQL database dump complete
 --
-
-\unrestrict SyJ14yTbDnHW0KuARqzSSU6r6rtSYIQRAmmhE6ZkQdJM4Feew5IIbQI0eo2JXc4
 
