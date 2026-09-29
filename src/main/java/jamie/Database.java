@@ -289,12 +289,34 @@ public class Database {
 
 
     public String createTradingKey(String publicKey, String privateKey, String user_id) throws Exception {
+        String getCurrentKeys = "SELECT id FROM trading_keys WHERE user_id = ?";
+
+        System.out.println("Handling trading key: " + publicKey);
+
+        try ( PreparedStatement gckst = db.prepareStatement(getCurrentKeys) ) {
+            gckst.setInt(1, Integer.parseInt(user_id));
+            ResultSet gckrs = gckst.executeQuery();
+
+            if (!gckrs.next()) {
+                String id = createNewTradingKeys(publicKey, privateKey, user_id);
+                return id;
+            } else {
+                String id = gckrs.getString("id");
+                updateCurrentTradingKeys(publicKey, privateKey, user_id);
+                return id;
+            }
+        }
+    }
+
+    public String createNewTradingKeys(String publicKey, String privateKey, String user_id) throws Exception {
         String encryptedPrivateKey = Encryption.encrypt(privateKey);
 
+        System.out.println("Creating new trading key");
+
         String sql = """
-            INSERT INTO trading_keys (id, public, private, user_id)
-            VALUES (?, ?, ?, ?)
-            """;
+        INSERT INTO trading_keys (id, public, private, user_id)
+        VALUES (?, ?, ?, ?)
+        """;
 
         try (PreparedStatement st = db.prepareStatement(sql)) {
 
@@ -311,6 +333,26 @@ public class Database {
 
         } catch (SQLException e) {
             return "";
+        }
+
+    }
+
+    public boolean updateCurrentTradingKeys(String publicKey, String privateKey, String user_id) throws Exception {
+        String encryptedPrivateKey = Encryption.encrypt(privateKey);
+
+        System.out.println("Trading key already exists");
+
+        String sql = "UPDATE trading_keys SET public=?, private=? WHERE user_id = ?";
+
+        try (PreparedStatement st = db.prepareStatement(sql)) {
+            st.setString(1, publicKey);
+            st.setString(2, encryptedPrivateKey);
+            st.setInt(3, Integer.parseInt(user_id));
+
+            st.executeUpdate();
+            st.close();
+
+            return true;
         }
     }
 
