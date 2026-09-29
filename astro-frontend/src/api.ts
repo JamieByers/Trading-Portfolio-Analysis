@@ -44,7 +44,7 @@ export async function postData(path, body) {
             : "/api"
     }
 
-    const response = await fetch("http://localhost:8080/api" + path, {
+    const response = await fetch(url + path, {
         method: "POST",
         credentials: "include",
         headers: {

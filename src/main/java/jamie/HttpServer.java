@@ -1,6 +1,5 @@
 package jamie;
 
-import java.awt.image.ReplicateScaleFilter;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.InputStreamReader;
@@ -288,12 +287,13 @@ public class HttpServer {
 
     public void handleGetRequest(Request request, BufferedWriter writer) throws Exception {
         String user_id = this.db.getUserIDFromSession(request.cookie);
-        HashMap<String, String> user = this.db.selectFromUsersUsingID(user_id);
 
         if (user_id.isEmpty()) {
             Responder.writeErrorResponse("Cookie doesnt exist: " + request.cookie, writer);
             return;
         }
+
+        HashMap<String, String> user = this.db.selectFromUsersUsingID(user_id);
 
         String path = request.path;
         String cacheKey = user_id + request.path;
